@@ -1,0 +1,36 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="collective.sugarcrm">
+
+  <five:registerPackage package="." initialize=".initialize" />
+  <utility
+    factory=".password.Password"
+    provides=".interfaces.IPasswordEncryption"
+    />
+
+  <adapter
+      for="*"
+      provides=".interfaces.ISugarCRM"
+      factory=".webservice.WebService"
+  />
+
+  <genericsetup:registerProfile
+      name="default"
+      title="collective.sugarcrm"
+      directory="profiles/default"
+      description="Installs the collective.sugarcrm package"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+  <genericsetup:importStep
+        name="pasplugin.sugarcrm"
+        title="collective.sugarcrm:setupPasPlugin"
+        description="Setup Pas plugin"
+        handler=".setuphandlers.setupPasPlugin">
+    <depends name="plone-final" />
+  </genericsetup:importStep>
+  <!-- -*- extra stuff goes here -*- -->
+  
+</configure>

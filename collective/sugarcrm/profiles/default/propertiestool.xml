@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="portal_properties" meta_type="Plone Properties Tool">
+ <object name="sugarcrm" meta_type="Plone Property Sheet">
+  <property name="title">SugarCRM Properties</property>
+  <property name="soap_url" type="string"></property>
+  <property name="soap_username" type="string"></property>
+  <property name="soap_password" type="string"></property>
+ </object>
+</object>
