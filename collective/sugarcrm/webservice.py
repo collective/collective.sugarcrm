@@ -103,19 +103,38 @@ class WebService(object):
 
         return infos
 
-    def get_entry(self, session=None, module='Contacts',  uid=''):
+    def get_entry(self, session=None, module='Contacts',  uid='',
+                  select_fields=[]):
         """get one entry identified by the uid argument. Type of entry
         is defined by the given module. Default to "Contacts"""
 
         if session is None:
             session = self.session
+        
+        if not select_fields:
+    
+            fields = self.get_module_fields(session, module)
+            select_fields = [field.name for field in fields]
 
-        results = self.client.service.get_entry(session, module, uid)
+        results = self.client.service.get_entry(session, module, uid,
+                                                select_fields)
         (entry,) = results.entry_list
 
         info = self._get_info(entry)
 
         return info
+
+    def get_module_fields(self, session=None, module="Contacts"):
+
+        if session is None:
+            session = self.session
+
+        results = self.client.service.get_module_fields(session, module)
+        module_fields = results.module_fields
+
+        fields = [field for field in module_fields]
+
+        return fields
 
 if __name__ == "__main__":
     url="http://mydoamin.com/soap.php"

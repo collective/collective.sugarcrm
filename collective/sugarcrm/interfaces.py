@@ -20,6 +20,18 @@ class ISugarCRM(interface.Interface):
         """Search for entry from the specified module.
         By default, search for contacts"""
     
+    def get_module_fields(session=None, module="Contacts"):
+        """Return a list of fields description for the provided module
+        
+        a field:
+
+           name = "id"
+           type = "id"
+           label = "ID:"
+           required = 0
+           options[] = <empty>
+
+        """
 
 class IComplexArgFactory(interface.Interface):
     """To create complex argument, just use this utility"""
