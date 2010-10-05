@@ -4,6 +4,7 @@
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="collective.sugarcrm">
 
   <five:registerPackage package="." initialize=".initialize" />
@@ -42,5 +43,12 @@
       class=".controlpanel.SugarCRMControlPanel"
       permission="cmf.ManagePortal"
       />
+
+<!-- PORTLET CONTACT -->
+  <utility
+     component=".portlet.contact"
+     provides="collective.portlet.contact.interfaces.IPortletContactUtility"
+     name="sugarcrm"
+     zcml:condition="installed collective.portlet.contact"/>
 
 </configure>
