@@ -22,9 +22,6 @@ url provided in the portal_properties/sugarcrm and users are
 * jane :: jane
 * jason :: jason
 
-The web services can be tested like this:
-
-  ./bin/instance run collective/sugarcrm/webservice
 
 Components
 ==========

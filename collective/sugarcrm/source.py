@@ -14,11 +14,14 @@ class ContactQuerySource(object):
     sugarcrm_module = "Contacts"
     
     def __init__(self, context):
+
         self.context = context
         self.webservice = ISugarCRM(context)
 
     def __contains__(self, value):
-        results = len(self.webservice.get_entry(uid=value, module=self.sugarcrm_module)) > 0
+
+        results = len(self.webservice.get_entry(uid=value,
+                                            module=self.sugarcrm_module)) > 0
         return results
 
     def getTerm(self, value):
@@ -30,29 +33,35 @@ class ContactQuerySource(object):
                 raise LookupError(value)
             term = self.buildTerm(results)
             return term
+
         except KeyError:
             raise LookupError(value)
 
     def buildTerm(self, entry):
+
         i = entry
-        if i['first_name'] is None:
-            name = i['last_name']
-        elif i['last_name'] is None:
-            name = i['first_name']
+        if 'name' in i.keys(): name = i['name']
+        elif 'first_name' in i.keys() and 'last_name' in i.keys():
+            name = i['first_name'] + ' ' + i['last_name']
         else:
-            name = i['first_name']+' '+i['last_name']
+            name = "Name not found"
+
         return SimpleTerm(i['id'], i['id'], name)
 
     def getTermByToken(self, token):
+
         return self.getTerm(token)
 
     def __iter__(self):
+
         return iter([])
 
     def __len__(self):
+
         return 100
 
     def search(self, query_string):
+
         results = self.webservice.search(query_string=query_string,
                                          module=self.sugarcrm_module,
                                          max=25)
@@ -67,10 +76,6 @@ class ContactSourceBinder(object):
 class AccountQuerySource(ContactQuerySource):
     
     sugarcrm_module = "Accounts"
-
-    def buildTerm(self, entry):
-        i = entry
-        return SimpleTerm(i['id'], i['id'], i['name'])
 
 class AccountSourceBinder(object):
     interface.implements(IContextSourceBinder)

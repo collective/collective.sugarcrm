@@ -21,8 +21,7 @@ def get_entry_cache_key(fun, self, session=None, module='Contacts',  uid='',
     cache_key = one_hour +"-"+ module +"-"+ uid
     return cache_key
 
-def get_module_fields_cache_key(fun, self, session, module):
-    #one hour + module + id
+def get_module_fields_cache_key(fun, self, session=None, module="Contacts"):
     one_hour = str(time() // (60*60))
     cache_key = one_hour +"-"+ module
     return cache_key
@@ -49,6 +48,7 @@ class WebService(object):
         self.password = password
         self.client = get_suds_client(self.url+'?wsdl', context=context)
         #self.client = Client(self.url+'?wsdl')
+        self._module_fields = {}
 
     def create(self, argument_type):
         """Create arguements types.
@@ -82,10 +82,13 @@ class WebService(object):
     def logout(self, session):
         self.client.service.logout(session)
 
-
     @property
     @ram.cache(session_cache_key)
     def session(self):
+        return self._session
+
+    @property
+    def _session(self):
         """Return the session of loggedin portal soap account"""
 
         utility = component.getUtility(interfaces.IPasswordEncryption)
@@ -122,12 +125,22 @@ class WebService(object):
         """get one entry identified by the uid argument. Type of entry
         is defined by the given module. Default to "Contacts"""
 
+        return self._get_entry(session=session, module=module,uid=uid,
+                               select_fields=select_fields)
+
+    def _get_entry(self, session=None, module='Contacts',  uid='',
+                  select_fields=[]):
+
         if session is None:
             session = self.session
-        
+
         if not select_fields:
-    
-            fields = self.get_module_fields(session, module)
+            #you can't call a cached method from an other cached method
+            if module in self._module_fields:
+                fields = self._module_fields[module]
+            else:
+                fields = self._get_module_fields(session=str(session),
+                                                 module=str(module))
             select_fields = [field.name for field in fields]
 
         results = self.client.service.get_entry(session, module, uid,
@@ -140,6 +153,9 @@ class WebService(object):
 
     @ram.cache(get_module_fields_cache_key)
     def get_module_fields(self, session=None, module="Contacts"):
+        return self._get_module_fields(session=session, module=module)
+
+    def _get_module_fields(self, session=None, module="Contacts"):
 
         if session is None:
             session = self.session
@@ -148,6 +164,7 @@ class WebService(object):
         module_fields = results.module_fields
 
         fields = [field for field in module_fields]
+        self._module_fields[module] = fields
 
         return fields
 
@@ -169,11 +186,16 @@ if __name__ == "__main__":
                                password=password)
 
     sid = service.session
+    print sid
     contacts = service.search(query_string=contact_firstname)
     contact = service.get_entry(uid=contacts[0]['id'])
     if not contact:
         print "ERROR can't find %s with get_entry"%contacts[0]
+    else:
+        print contact
     accounts = service.search(query_string=account_name, module="Accounts")
     account = service.get_entry(uid=accounts[0]['id'], module="Accounts")
     if not account:
         print "ERROR can't find %s with get_entry"%accounts[0]
+    else:
+        print account
