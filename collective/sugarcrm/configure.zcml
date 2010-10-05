@@ -1,5 +1,6 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
@@ -32,5 +33,14 @@
     <depends name="plone-final" />
   </genericsetup:importStep>
   <!-- -*- extra stuff goes here -*- -->
-  
+
+  <adapter factory=".controlpanel.SugarCRMControlPanelAdapter" />
+
+  <browser:page
+      name="sugarcrm-controlpanel"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".controlpanel.SugarCRMControlPanel"
+      permission="cmf.ManagePortal"
+      />
+
 </configure>
