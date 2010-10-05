@@ -4,8 +4,28 @@ from zope import component
 from zope import interface
 from Products.CMFCore.utils import getToolByName
 import logging
-
+from z3c.suds import get_suds_client
+from plone.memoize import ram
+from time import time
 logger = logging.getLogger('collective.sugarcrm')
+
+def session_cache_key(fun, self):
+    #5 minutes
+    five_minute = str(time() // (5*60))
+    return five_minute
+
+def get_entry_cache_key(fun, self, session=None, module='Contacts',  uid='',
+                  select_fields=[]):
+    #one hour + module + id
+    one_hour = str(time() // (60*60))
+    cache_key = one_hour +"-"+ module +"-"+ uid
+    return cache_key
+
+def get_module_fields_cache_key(fun, self, session, module):
+    #one hour + module + id
+    one_hour = str(time() // (60*60))
+    cache_key = one_hour +"-"+ module
+    return cache_key
 
 class WebService(object):
     """Code base between normal and loggedin component"""
@@ -27,8 +47,8 @@ class WebService(object):
         self.url = url
         self.username = username
         self.password = password
-        self.client = Client(self.url+'?wsdl')
-        self._session = None
+        self.client = get_suds_client(self.url+'?wsdl', context=context)
+        #self.client = Client(self.url+'?wsdl')
 
     def create(self, argument_type):
         """Create arguements types.
@@ -64,20 +84,13 @@ class WebService(object):
 
 
     @property
+    @ram.cache(session_cache_key)
     def session(self):
+        """Return the session of loggedin portal soap account"""
 
-        if self._session: return self._session
         utility = component.getUtility(interfaces.IPasswordEncryption)
-        user = self.client.factory.create('user_auth')
-
-        user.user_name = self.username
-        user.password = utility.crypt(self.password)
-        login = self.client.service.login(user)
-
-        if login.id != "-1":
-            self._session = login.id
-
-        return self._session
+        login = self.login(self.username, utility.crypt(self.password))
+        return login.id
 
     def search(self, session=None, query_string='', module='Contacts', offset=0,
                       max=100):
@@ -103,6 +116,7 @@ class WebService(object):
 
         return infos
 
+    @ram.cache(get_entry_cache_key)
     def get_entry(self, session=None, module='Contacts',  uid='',
                   select_fields=[]):
         """get one entry identified by the uid argument. Type of entry
@@ -124,6 +138,7 @@ class WebService(object):
 
         return info
 
+    @ram.cache(get_module_fields_cache_key)
     def get_module_fields(self, session=None, module="Contacts"):
 
         if session is None:
@@ -137,11 +152,11 @@ class WebService(object):
         return fields
 
 if __name__ == "__main__":
-    url="http://mydoamin.com/soap.php"
-    username = "admin"
-    password = "admin"
-    contact_firstname = "Arnaud"
-    account_name = "Makina"
+    url="http://trial.sugarcrm.com/wbnawe7415/service/v2/soap.php"
+    username = "will"
+    password = "will"
+    contact_firstname = "Jerald"
+    account_name = "Max Holdings Ltd"
 
     #register password utility
     from zope.component import getGlobalSiteManager

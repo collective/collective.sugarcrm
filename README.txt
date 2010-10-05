@@ -9,11 +9,22 @@ This add-on provide components to use SugarCRM in Plone.
 Status
 ======
 
-Under heavy developpement for SugarCRM 6.0
+Under heavy developpement for SugarCRM 6.0 with the version 2 of the soap:
+http://mydomain.com/service/v2/soap.php
 
-Found a bug with get_entry, doesn't return any results with a good id.
+No tests at all. For integration tests, go on
+http://www.sugarcrm.com/crm/ondemand_eval.html , fill the form and set
+url provided in the portal_properties/sugarcrm and users are
 
-No tests at all.
+* will :: will
+* sarah :: sarah
+* jim :: jim
+* jane :: jane
+* jason :: jason
+
+The web services can be tested like this:
+
+  ./bin/instance run collective/sugarcrm/webservice
 
 Components
 ==========

@@ -25,7 +25,8 @@ setup(name='collective.sugarcrm',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'suds'
+          'suds',
+	  'z3c.suds'
           # -*- Extra requirements: -*-
       ],
       entry_points="""
