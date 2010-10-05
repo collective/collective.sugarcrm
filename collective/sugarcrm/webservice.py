@@ -76,7 +76,12 @@ class WebService(object):
         user = self.client.factory.create('user_auth')
         user.user_name = username
         user.password = password
-        login = self.client.service.login(user)
+        try:
+            login = self.client.service.login(user)
+        except WebFault, e:
+            if e.fault.faultstring == "Invalid Login":
+                return None
+            raise e
         return login
 
     def logout(self, session):

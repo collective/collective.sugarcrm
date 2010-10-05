@@ -106,10 +106,8 @@ class SugarCRMControlPanel(ControlPanelForm):
         sugarcrm = interfaces.ISugarCRM(self.context)
         utils = getUtility(interfaces.IPasswordEncryption)
 
-        try:
-            login = sugarcrm.login(data['soap_username'],
+        login = sugarcrm.login(data['soap_username'],
                                utils.crypt(data['soap_password']))
-        except WebFault, e:
-            if e.fault.faultstring == "Invalid Login":
-                message = _("Invalid credentials or URL.")
-                IStatusMessage(self.request).addStatusMessage(message, type='error')
+        if not login:
+            message = _("Invalid credentials or URL.")
+            IStatusMessage(self.request).addStatusMessage(message, type='error')

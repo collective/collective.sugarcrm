@@ -9,8 +9,7 @@ from zope import interface
 from collective.sugarcrm.interfaces import IPasswordEncryption, ISugarCRM
 from AccessControl import ClassSecurityInfo
 
-
-class AuthPlugin(plugins.BasePlugin.BasePlugin, Cacheable):
+class AuthPlugin(plugins.BasePlugin.BasePlugin):
     """This plugin try to authenticate the user
     with the login method of the sugarcrm webservice"""
     
@@ -22,10 +21,6 @@ class AuthPlugin(plugins.BasePlugin.BasePlugin, Cacheable):
     def __init__(self, id, title=None):
         self.id = self.id = id
         self.title = title
-
-    security.declarePrivate('invalidateCacheForChangedUser')
-    def invalidateCacheForChangedUser(self, user_id):
-        pass
 
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
@@ -39,14 +34,10 @@ class AuthPlugin(plugins.BasePlugin.BasePlugin, Cacheable):
         encrypted_password = utility.crypt(password)
 
         sugarcrm = ISugarCRM(self)
-        try:
-            session = sugarcrm.login(login, encrypted_password)
-        except Exception, e:
-            logger.info(e)
-            return None
+        session = sugarcrm.login(login, encrypted_password)
 
-        if session.id == "-1":
-            return None
+        if session is None:
+            return
 
         return login, login
 

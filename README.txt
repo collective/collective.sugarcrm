@@ -51,6 +51,13 @@ password
 
 A utility is available to crypt password for using with webservice (sic)
 
+portlet contact
+---------------
+
+With a condition on collective.portlet.contact installed,
+it provides a backend from your sugarCRM contact address book to the
+contact portlet
+
 INSTALL
 =======
 
