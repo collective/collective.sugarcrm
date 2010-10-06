@@ -36,7 +36,10 @@
   <!-- -*- extra stuff goes here -*- -->
 
   <adapter factory=".controlpanel.SugarCRMControlPanelAdapter" />
-
+  <browser:resource
+    name="collective.sugarcrm.gif"
+    file="sugarcrm.gif"
+    />
   <browser:page
       name="sugarcrm-controlpanel"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
