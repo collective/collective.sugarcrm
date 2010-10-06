@@ -5,11 +5,13 @@ from collective.portlet.contact.utils import encode_email
 from Products.CMFCore.utils import getToolByName
 
 class Contact(object):
-    """collective.portlet.contact backend for sugarcrm Contacts module"""
+    """Utility class for collective.portlet.contact backend. It use 
+    'Contacts' module."""
     interface.implements(IPortletContactUtility)
 
     def search(self, context, q="", limit=10):
         """search within sugarcrm contacts"""
+
         sugarcrm = interfaces.ISugarCRM(context)
         results = sugarcrm.search(query_string=q,
                         module="Contacts", max=limit)
@@ -24,13 +26,24 @@ class Contact(object):
         urltool = getToolByName(context, 'portal_url')
         sugarcrm = interfaces.ISugarCRM(context)
         c = sugarcrm.get_entry(module="Contacts",uid=uniq_id)
+
+        if not c:
+            return {'fullname': '',
+                'phonenumber': '',
+                'mail': '',
+                'employeetype': '',
+                'uid': uniq_id,
+                'photourl': ''}
+
         jpegurl = urltool() + '/@@ldapJpegPhoto?uid='+uniq_id
 
-        return {'fullname': c['first_name'] +' '+ c['last_name'],
+        fullname = ' '.join((c.get('first_name','') or '', c.get('last_name','') or '')).strip()
+
+        return {'fullname': fullname,
                 'phonenumber': c['phone_work'],
                 'mail': encode_email(c['email1'], c['email1']),
                 'employeetype': c['title'],
                 'uid': uniq_id,
                 'photourl': ''}
-        
+
 contact = Contact()
