@@ -9,19 +9,17 @@ This add-on provide components to use SugarCRM in Plone.
 Status
 ======
 
-Under heavy developpement for SugarCRM 6.0 with the version 2 of the soap:
-http://mydomain.com/service/v2/soap.php
+Useable in production
 
-No tests at all. For integration tests, go on
-http://www.sugarcrm.com/crm/ondemand_eval.html , fill the form and set
-url provided in the portal_properties/sugarcrm and users are
+tests
+-----
 
-* will :: will
-* sarah :: sarah
-* jim :: jim
-* jane :: jane
-* jason :: jason
+Tests are run with this URL: http://trial.sugarcrm.com/wbnawe7415/service/v2/soap.php
+If it is not available, please fill the demand for a new demo at
+http://www.sugarcrm.com/crm/ondemand_eval.html and export the URL into
+environnement:
 
+  export SUGARCRM_SOAP_URL="NEW TRIAL URL"
 
 Components
 ==========
@@ -62,7 +60,8 @@ INSTALL
 =======
 
 A generic setup is registred to setup the pas plugin and needed properties
-to configure access to the sugarcrm instance you want to use
+to configure access to the sugarcrm instance you want to use. A control panel
+is added to let you configure access to sugarcrm.
 
 Credits
 =======

@@ -10,9 +10,9 @@ import suds
 
 class TestWebService(unittest.TestCase):
     def setUp(self):
-        self.url = utils.DEMO['soap_url']
-        self.username = utils.DEMO['soap_username']
-        self.password = utils.DEMO['soap_password']
+        self.url = utils.SOAP['soap_url']
+        self.username = utils.SOAP['soap_username']
+        self.password = utils.SOAP['soap_password']
         self.ws = WebService(None,
                              url=self.url,
                         username=self.username,
@@ -61,7 +61,7 @@ class TestWebService(unittest.TestCase):
         self.ws.logout(login.id)
         self.failUnlessRaises(suds.WebFault,
                           self.ws.search,
-                          login.id, 'jerald')
+                          login.id, utils.CONTACT['first_name'])
 
     def test_session(self):
         session = self.ws.session
@@ -70,10 +70,9 @@ class TestWebService(unittest.TestCase):
         self.assertEqual(session, session2)
 
     def test_search(self):
-        results = self.ws.search(query_string='jerald')
+        results = self.ws.search(query_string=utils.CONTACT['first_name'])
         jerald = results[0]
-        self.assertEqual(len(results),1)
-        self.assertEqual(jerald['name'],'Jerald Arenas')
+        self.assertEqual(jerald['name'], utils.CONTACT['name'])
         for k in ('name', 'phone_work', 'title', 'assigned_user_name',
                   'account_name', 'id'):
             self.assert_(k in jerald.keys(), '%s not in results'%k)
@@ -82,9 +81,9 @@ class TestWebService(unittest.TestCase):
         results = self.ws.search(query_string='jerald')
         id = results[0]['id']
         entry = self.ws.get_entry(id=id)
-        self.assertEqual(entry['first_name'],'Jerald')
-        self.assertEqual(entry['last_name'],'Arenas')
-        self.assertEqual(entry['primary_address_city'],'Cupertino')
+        self.assertEqual(entry['first_name'],utils.CONTACT['first_name'])
+        self.assertEqual(entry['last_name'], utils.CONTACT['last_name'])
+        self.assertEqual(entry['primary_address_city'],utils.CONTACT['city'])
 
     def test_get_module_fields(self):
         #TODO
