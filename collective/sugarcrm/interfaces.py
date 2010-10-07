@@ -12,9 +12,6 @@ class ISugarCRM(interface.Interface):
     def get_entry(session=None, module_name="Contacts", id=""):
         """Return an entry defined by the id with all fields"""
 
-    def get_entries(session=None, module_name="Contacts", ids=[]):
-        """Retrieves a list of records based on the specified ID's."""
-
     def search(session=None, query_string='', module='Contacts',offset=0,
                            max=None):
         """Search for entry from the specified module.

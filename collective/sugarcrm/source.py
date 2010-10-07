@@ -23,14 +23,14 @@ class ContactQuerySource(object):
 
     def __contains__(self, value):
 
-        contains = len(self.webservice.get_entry(uid=value,
+        contains = len(self.webservice.get_entry(id=value,
                                             module=self.sugarcrm_module)) > 0
         logger.debug('source.contains %s -> %s'%(value, contains))
         return contains
 
     def getTerm(self, value):
 
-        entry = self.webservice.get_entry(uid=value,
+        entry = self.webservice.get_entry(id=value,
                                             module=self.sugarcrm_module)
         #I know, I'm suppose to raise LookupError, but it fails with
         #plone.formwidget.autocomplete (my only use case at the moment)

@@ -25,7 +25,7 @@ class Contact(object):
 
         urltool = getToolByName(context, 'portal_url')
         sugarcrm = interfaces.ISugarCRM(context)
-        c = sugarcrm.get_entry(module="Contacts",uid=uniq_id)
+        c = sugarcrm.get_entry(module="Contacts",id=uniq_id)
 
         if not c:
             return {'fullname': '',

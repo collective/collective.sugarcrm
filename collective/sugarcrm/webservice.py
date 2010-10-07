@@ -20,11 +20,11 @@ def session_cache_key(fun, self):
     five_minute = str(time() // (5*60))
     return five_minute + username + password
 
-def get_entry_cache_key(fun, self, session=None, module='Contacts',  uid='',
+def get_entry_cache_key(fun, self, session=None, module='Contacts',  id='',
                   select_fields=[]):
     #one hour + module + id
     one_hour = str(time() // (60*60))
-    cache_key = one_hour +"-"+ module +"-"+ uid
+    cache_key = one_hour +"-"+ module +"-"+ id
     return cache_key
 
 def get_module_fields_cache_key(fun, self, session=None, module="Contacts"):
@@ -97,7 +97,7 @@ class WebService(object):
         print the suds client on current output
         """
         if self.client is not None:
-            return self.client.create(argument_type)
+            return self.client.factory.create(argument_type)
 
     def _entry2dict(self, entry, name_value_list=True):
         info = {}
@@ -145,12 +145,12 @@ class WebService(object):
         login = self.login(self.username, self.password, crypt=True)
         if login is not None:
             logger.debug('ws.session -> %s'%login.id)
-            return login.id
+            return str(login.id)
 
         logger.debug('ws.session -> None')
 
     def search(self, session=None, query_string='', module='Contacts',
-                offset=0, max=100):
+                offset="0", max="100"):
         """search a contact or whatevery you want. The search is based on
         query_string argument and given module (default to Contacts)
         
@@ -178,15 +178,15 @@ class WebService(object):
         return infos
 
     @ram.cache(get_entry_cache_key)
-    def get_entry(self, session=None, module='Contacts',  uid='',
+    def get_entry(self, session=None, module='Contacts',  id='',
                   select_fields=[]):
-        """get one entry identified by the uid argument. Type of entry
+        """get one entry identified by the id argument. Type of entry
         is defined by the given module. Default to "Contacts"""
 
-        return self._get_entry(session=session, module=module,uid=uid,
+        return self._get_entry(session=session, module=module,id=id,
                                select_fields=select_fields)
 
-    def _get_entry(self, session=None, module='Contacts',  uid='',
+    def _get_entry(self, session=None, module='Contacts',  id='',
                   select_fields=[]):
 
         if self.client is None: return
@@ -204,13 +204,13 @@ class WebService(object):
                                                  module=str(module))
             select_fields = [field.name for field in fields]
 
-        results = self.client.service.get_entry(session, module, uid,
+        results = self.client.service.get_entry(session, module, id,
                                                 select_fields)
         (entry,) = results.entry_list
 
         info = self._entry2dict(entry)
 
-        logger.debug('ws.get_entry(%s, %s) -> %s'%(module, uid, info))
+        logger.debug('ws.get_entry(%s, %s) -> %s'%(module, id, info))
         return info
 
     @ram.cache(get_module_fields_cache_key)
@@ -232,37 +232,3 @@ class WebService(object):
         self._module_fields[module] = fields
 
         return fields
-
-#IF THE SERVICE IS NOT VALID, FAKE THE LIB
-
-if __name__ == "__main__":
-    url="http://trial.sugarcrm.com/wbnawe7415/service/v2/soap.php"
-    username = "will"
-    password = "will"
-    contact_firstname = "Jerald"
-    account_name = "Max Holdings Ltd"
-
-    #register password utility
-    from zope.component import getGlobalSiteManager
-    from collective.sugarcrm.password import Password
-    gsm = getGlobalSiteManager()
-    passwordUtility = Password()
-    gsm.registerUtility(passwordUtility, interfaces.IPasswordEncryption)
-
-    service = WebService(None, url=url, username=username,
-                               password=password)
-
-    sid = service.session
-    print sid
-    contacts = service.search(query_string=contact_firstname)
-    contact = service.get_entry(uid=contacts[0]['id'])
-    if not contact:
-        print "ERROR can't find %s with get_entry"%contacts[0]
-    else:
-        print contact
-    accounts = service.search(query_string=account_name, module="Accounts")
-    account = service.get_entry(uid=accounts[0]['id'], module="Accounts")
-    if not account:
-        print "ERROR can't find %s with get_entry"%accounts[0]
-    else:
-        print account
