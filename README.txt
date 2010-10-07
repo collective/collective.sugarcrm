@@ -1,7 +1,7 @@
 Introduction
 ============
 
-SugarCRM is an open-source software-solution vendor which produces the Sugar
+SugarCRM_ is an open-source software-solution vendor which produces the Sugar
 Customer Relationship Management (CRM) system.
 
 This add-on provide components to use SugarCRM in Plone.
@@ -84,3 +84,4 @@ Contributors
 .. |makinacom| image:: http://depot.makina-corpus.org/public/logo.gif
 .. _makinacom:  http://www.makina-corpus.com
 .. _suds: https://fedorahosted.org/suds
+.. _sugarcrm: http://www.sugarcrm.com/crm
