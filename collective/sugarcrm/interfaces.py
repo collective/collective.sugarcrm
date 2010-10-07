@@ -13,7 +13,7 @@ class ISugarCRM(interface.Interface):
         """Return an entry defined by the id with all fields"""
 
     def get_entries(session=None, module_name="Contacts", ids=[]):
-        """Retrieves a list of records based on the specified ID’s."""
+        """Retrieves a list of records based on the specified ID's."""
 
     def search(session=None, query_string='', module='Contacts',offset=0,
                            max=None):
