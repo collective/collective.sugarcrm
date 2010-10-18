@@ -37,12 +37,13 @@ class Contact(object):
 
         jpegurl = urltool() + '/@@ldapJpegPhoto?uid='+uniq_id
 
-        fullname = ' '.join((c.get('first_name','') or '', c.get('last_name','') or '')).strip()
+        fullname = ' '.join((c.get('first_name','') or '',
+                             c.get('last_name','') or '')).strip()
 
         return {'fullname': fullname,
-                'phonenumber': c['phone_work'],
-                'mail': encode_email(c['email1'], c['email1']),
-                'employeetype': c['title'],
+                'phonenumber': c.get('phone_work',''),
+                'mail': encode_email(c.get('email1',''), c.get('email1','')),
+                'employeetype': c.get('title',''),
                 'uid': uniq_id,
                 'photourl': ''}
 
