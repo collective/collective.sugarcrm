@@ -9,6 +9,9 @@ from collective.sugarcrm.password import Password
 import suds
 
 class TestWebService(unittest.TestCase):
+    """Integration test with the real webservice. Check utils
+    and update with a good free trial demo of SugarCRM"""
+
     def setUp(self):
         self.url = utils.SOAP['soap_url']
         self.username = utils.SOAP['soap_username']
