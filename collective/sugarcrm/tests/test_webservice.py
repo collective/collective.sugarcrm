@@ -18,11 +18,37 @@ class FakeUserAuth(object):
         self.user_name = None
         self.password = None
 
+class FakeLoggedIn(object):
+    def __init__(self, id):
+        self.id = id
+
+class FakeFault(object):
+    def __init__(self):
+        self.faultstring = "Invalid Login"
+
+class FakeResults(object):
+    def __init__(self, entry_list=[]):
+        self.entry_list= entry_list
+
 class FakeService(object):
+    def __init__(self):
+        #marker specific for tests
+        self.logged = False
+
     def login(self, user):
         if user.user_name == 'will':
-            return 'session'
-        raise suds.WebFault("Invalid Login")
+            self.logged = True
+            return FakeLoggedIn('session')
+        raise suds.WebFault(FakeFault(), None)
+
+    def logout(self, session):
+        if session == 'session':
+            self.logged = False
+        
+    def search_by_module(self, session, query_string, modules, offset, max):
+        if session=='session' and query_string and len(modules)>0:
+            pass #tired to create new fake classes
+        return []
 
 class FakeClient(object):
     def __init__(self):
@@ -35,7 +61,11 @@ class UnitTest(unittest.TestCase):
     def setUp(self):
         self.ws = WebService(None)
         self.ws._client = FakeClient()
-    
+        def password():
+            return Password()
+        self.ws.password_utility = password
+        self.ws.username = 'will'
+
     def test_client(self):
         self.failUnless(type(self.ws.client)==FakeClient)
 
@@ -45,18 +75,26 @@ class UnitTest(unittest.TestCase):
 
     def test_login(self):
         login = self.ws.login('will', 'will')
-        self.failUnless(login == 'session')
-        #TODO: check raise
+        self.failUnless(login.id == 'session')
+        self.failUnless(self.ws.login('', '') is None)
+
+    def test_logout(self):
+        self.ws.logout('session')
+        self.failUnless(self.ws._client.service.logged == False)
 
     def test_session(self):
-        pass
-    
+        session = self.ws.session
+        self.failUnless(session=='session')
+        self.ws.username = ''
+        session = self.ws.session
+        self.failUnless(session is None)
+
     def test_search(self):
         pass
-    
+
     def test_get_entry(self):
         pass
-    
+
     def test_get_module_fields(self):
         pass
 
@@ -95,10 +133,6 @@ class IntegrationTest(unittest.TestCase):
         self.assert_(user_auth is not None)
         self.assert_(hasattr(user_auth, 'user_name'))
         self.assert_(hasattr( user_auth, 'password'))
-
-    def test_entry2dict(self):
-        #TODO
-        pass
 
     def test_login(self):
         login = self.ws.login(self.username, self.password, crypt=True)

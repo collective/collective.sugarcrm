@@ -116,7 +116,7 @@ class WebService(object):
         if not crypt:
             user.password = password
         else:
-            utility = component.getUtility(interfaces.IPasswordEncryption)
+            utility = self.password_utility()
             user.password = utility.crypt(password)
         try:
             login = self.client.service.login(user)
@@ -127,6 +127,9 @@ class WebService(object):
                 return None
             raise e
         return login
+
+    def password_utility(self):
+        return component.getUtility(interfaces.IPasswordEncryption)
 
     def logout(self, session):
         if self.client is None: return
