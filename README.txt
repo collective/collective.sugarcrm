@@ -14,7 +14,7 @@ Useable in production
 tests
 -----
 
-Tests are run with this URL: http://trial.sugarcrm.com/wbnawe7415/service/v2/soap.php
+Tests are run with a trial URL
 If it is not available, please fill the demand for a new demo at
 http://www.sugarcrm.com/crm/ondemand_eval.html and export the URL into
 environnement:
@@ -27,8 +27,8 @@ Components
 pasplugin
 ---------
 
-IAuthenticationPlugin has been implemented to provide a way to login with
-sugarcrm credentials
+A PAS plugin has been implemented. You can logged into Plone with sugarcrm
+credentials.
 
 webservice
 ----------
