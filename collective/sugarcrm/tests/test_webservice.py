@@ -8,7 +8,59 @@ from zope.component import getGlobalSiteManager
 from collective.sugarcrm.password import Password
 import suds
 
-class TestWebService(unittest.TestCase):
+class FakeFactory(object):
+    def create(self, argument_type):
+        if argument_type == 'user_auth':
+            return FakeUserAuth()
+
+class FakeUserAuth(object):
+    def __init__(self):
+        self.user_name = None
+        self.password = None
+
+class FakeService(object):
+    def login(self, user):
+        if user.user_name == 'will':
+            return 'session'
+        raise suds.WebFault("Invalid Login")
+
+class FakeClient(object):
+    def __init__(self):
+        self.factory = FakeFactory()
+        self.service = FakeService()
+
+
+class UnitTest(unittest.TestCase):
+
+    def setUp(self):
+        self.ws = WebService(None)
+        self.ws._client = FakeClient()
+    
+    def test_client(self):
+        self.failUnless(type(self.ws.client)==FakeClient)
+
+    def test_create(self):
+        created = self.ws.create('user_auth')
+        self.failUnless(type(created)==FakeUserAuth)
+
+    def test_login(self):
+        login = self.ws.login('will', 'will')
+        self.failUnless(login == 'session')
+        #TODO: check raise
+
+    def test_session(self):
+        pass
+    
+    def test_search(self):
+        pass
+    
+    def test_get_entry(self):
+        pass
+    
+    def test_get_module_fields(self):
+        pass
+
+class IntegrationTest(unittest.TestCase):
     """Integration test with the real webservice. Check utils
     and update with a good free trial demo of SugarCRM"""
 
@@ -93,5 +145,7 @@ class TestWebService(unittest.TestCase):
         pass
 
 def test_suite():
-    return unittest.makeSuite(TestWebService)
-
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(UnitTest))
+    suite.addTest(unittest.makeSuite(IntegrationTest))
+    return suite

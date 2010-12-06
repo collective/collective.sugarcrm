@@ -4,8 +4,9 @@ Changelog
 1.0b2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- PAS plugin: Implements IUserEnumerationPlugin and IPropertiesPlugin.
+  Manage cache with Cacheable api.
+  [toutpt]
 
 1.0b1 (2010-10-07)
 ------------------

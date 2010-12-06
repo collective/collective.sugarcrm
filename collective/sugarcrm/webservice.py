@@ -32,6 +32,7 @@ def get_module_fields_cache_key(fun, self, session=None, module="Contacts"):
     cache_key = one_hour +"-"+ module
     return cache_key
 
+
 class WebService(object):
     """Code base between normal and loggedin component"""
     
@@ -132,12 +133,7 @@ class WebService(object):
         self.client.service.logout(session)
 
     @property
-    @ram.cache(session_cache_key)
     def session(self):
-        return self._session
-
-    @property
-    def _session(self):
         """Return the session of loggedin portal soap account"""
 
         if self.client is None: return
@@ -177,16 +173,8 @@ class WebService(object):
         logger.debug('ws.search %s -> %s results'%(query_string, len(infos)))
         return infos
 
-    @ram.cache(get_entry_cache_key)
+
     def get_entry(self, session=None, module='Contacts',  id='',
-                  select_fields=[]):
-        """get one entry identified by the id argument. Type of entry
-        is defined by the given module. Default to "Contacts"""
-
-        return self._get_entry(session=session, module=module,id=id,
-                               select_fields=select_fields)
-
-    def _get_entry(self, session=None, module='Contacts',  id='',
                   select_fields=[]):
 
         if self.client is None: return
@@ -213,11 +201,7 @@ class WebService(object):
         logger.debug('ws.get_entry(%s, %s) -> %s'%(module, id, info))
         return info
 
-    @ram.cache(get_module_fields_cache_key)
     def get_module_fields(self, session=None, module="Contacts"):
-        return self._get_module_fields(session=session, module=module)
-
-    def _get_module_fields(self, session=None, module="Contacts"):
 
         if self.client is None: return
         if session is None: #session as arg
@@ -232,3 +216,24 @@ class WebService(object):
         self._module_fields[module] = fields
 
         return fields
+
+class WebServiceCached(WebService):
+
+    @property
+    @ram.cache(session_cache_key)
+    def session(self):
+        return super(WebService, self).session
+
+    @ram.cache(get_entry_cache_key)
+    def get_entry(self, session=None, module='Contacts',  id='',
+                  select_fields=[]):
+        return super(WebService, self).get_entry(session=session,
+                                                 module=module,
+                                                 id=id,
+                                                 select_fields=select_fields)
+
+    @ram.cache(get_module_fields_cache_key)
+    def get_module_fields(self, session=None, module="Contacts"):
+        return super(WebService, self).get_module_fields(session=session,
+                                                         module=module)
+

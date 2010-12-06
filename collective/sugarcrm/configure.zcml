@@ -13,10 +13,17 @@
     provides=".interfaces.IPasswordEncryption"
     />
 
+  <!-- REMOVE CACHE
   <adapter
       for="*"
       provides=".interfaces.ISugarCRM"
       factory=".webservice.WebService"
+  />
+  -->
+  <adapter
+      for="*"
+      provides=".interfaces.ISugarCRM"
+      factory=".webservice.WebServiceCached"
   />
 
   <genericsetup:registerProfile
