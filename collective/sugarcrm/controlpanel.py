@@ -24,34 +24,31 @@ class ISugarCRMSchema(interface.Interface):
     """Combined schema for the adapter lookup.
     """
 
-    soap_url = schema.TextLine(title=_(u'label_soap_url',
+    soap_url = schema.ASCIILine(title=_(u'label_soap_url',
                                 default=u'SugarCRM SOAP URL'),
                         description=_(u'help_soap_url',
                                       default=u"Your SugarCRM SOAP v2 url: "
                               u"http://mysugardomain.com/service/v2/soap.php"),
-                        default=None,
                         required=True)
 
-    soap_username = schema.TextLine(title=_(u'label_soap_userid',
+    soap_username = schema.ASCIILine(title=_(u'label_soap_userid',
                                      default=u"SOAP user login"),
                              description=_(u'help_soap_username',
                                            default=u"it will be used to"
                                    u"authenticate the portal actions done with"
                                    u"ISugarCRM component"),
-                           default=None,
                            required=True)
 
     soap_password = schema.Password(title=_(u'label_soap_pass',
                              default=u'SugarCRM SOAP password'),
-                         default=None,
                          required=False)
-    
+
     activate_service = schema.Bool(title=_(u'label_activate_service',
                                    default=u'Activate WebService'),
                                    default=False)
 
     activate_pasplugin = schema.Bool(title=_(u'label_activate_pasplugin',
-                                   default=u'Activate PAS Plugin (Authentication, User properties, '),
+                                   default=u'Activate PAS Plugin (Authentication, User properties) '),
                                    default=False)
 
 class SugarCRMControlPanelAdapter(SchemaAdapterBase):
@@ -67,15 +64,16 @@ class SugarCRMControlPanelAdapter(SchemaAdapterBase):
         return self.get('soap_url')
 
     def set_soap_url(self, value):
-        self.set('soap_url', value)
+        self.set('soap_url', str(value))
 
     soap_url = property(get_soap_url, set_soap_url)
 
     def get_soap_pass(self):
-        return self.get('soap_password')
+        return str(self.get('soap_password'))
 
     def set_soap_pass(self, value):
-        self.set('soap_password', value)
+        if type(value) in (unicode, str):
+            self.set('soap_password', str(value))
 
     soap_password = property(get_soap_pass, set_soap_pass)
 
@@ -83,7 +81,7 @@ class SugarCRMControlPanelAdapter(SchemaAdapterBase):
         return self.get('soap_username')
 
     def set_soap_username(self, value):
-        self.set('soap_username', value)
+        self.set('soap_username', str(value))
 
     soap_username = property(get_soap_username, set_soap_username)
 
@@ -122,15 +120,17 @@ class SugarCRMControlPanel(ControlPanelForm):
     form_name = _("SugarCRM settings")
 
     def _on_save(self, data=None):
-
-        if not 'soap_password' in data or not data['soap_password']:
-            data['soap_password'] = self.context.portal_properties.sugarcrm.soap_password
-
+        password = data.get('soap_password', '')
+        if type(password) not in (unicode, str) or not password:
+            password = str(self.context.portal_properties.sugarcrm.soap_password)
+        if not password or not data.get('activate_service', False):
+            return
+        self.context.plone_log(password)
         sugarcrm = interfaces.ISugarCRM(self.context)
         utils = component.getUtility(interfaces.IPasswordEncryption)
 
-        login = sugarcrm.login(data['soap_username'],
-                               utils.crypt(data['soap_password']))
+        login = sugarcrm.login(str(data['soap_username']),
+                               utils.crypt(password))
         if not login:
             message = _("Invalid credentials or URL.")
             IStatusMessage(self.request).addStatusMessage(message, type='error')

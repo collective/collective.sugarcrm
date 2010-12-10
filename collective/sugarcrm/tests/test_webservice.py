@@ -67,6 +67,11 @@ class UnitTest(unittest.TestCase):
         self.ws.password_utility = password
         self.ws.username = 'will'
 
+    def test_activated(self):
+        ws = WebService(None)
+        self.failUnless(ws.activated==False)
+        self.failUnless(self.ws.activated==True)
+
     def test_client(self):
         self.failUnless(type(self.ws.client)==FakeClient)
 
@@ -123,6 +128,7 @@ class IntegrationTest(unittest.TestCase):
         self.assertEqual(ws.username, self.username)
         self.assertEqual(ws.password, self.password)
         self.assert_(ws.client is not None)
+        self.assert_(ws.activated==True)
         #check interface implementation
         self.assert_(interfaces.ISugarCRM.providedBy(ws))
         try:

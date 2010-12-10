@@ -29,6 +29,7 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
     def __init__(self, id, title=None):
         self.id = id
         self.title = title
+        self._activated = False
 
     def _passord_utility(self):
         return component.getUtility(IPasswordEncryption)
@@ -36,10 +37,20 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
     def _sugarcrm(self):
         return ISugarCRM(self)
 
+    def get_activated(self):
+        """Return True if webservice and pasplugin are activated"""
+        return self._activated
+    
+    def set_activated(self, value):
+        self._activated = bool(value)
+
+    activated = property(get_activated, set_activated)
+
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
         """ See IAuthenticationPlugin.
         """
+        if not self.activated:return
         login = credentials.get('login')
         password = credentials.get('password')
 
@@ -69,6 +80,7 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
         """ See IUserEnumerationPlugin.
         """
 
+        if not self.activated:return []
         service = self._sugarcrm()
         if isinstance( id, basestring ):
             id = [ str(id) ]
@@ -107,6 +119,8 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
     def getPropertiesForUser(self, user, request=None):
         """ See IPropertiesPlugin.
         """
+        if not self.activated:return {}
+
         user_name = user.getUserName()
 
         service = self._sugarcrm()
@@ -135,6 +149,7 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
                       , **kw
                       ):
 
+        if not self.activated:return []
         view_name = 'sugarcrmenumerateUsers'
 
         if isinstance( id, basestring ):
@@ -169,6 +184,8 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
     def authenticateCredentials(self, credentials):
         """ See IAuthenticationPlugin.
         """
+        if not self.activated:return
+
         login = credentials.get('login')
         password = credentials.get('password')
 
@@ -198,6 +215,7 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
         """ See IPropertiesPlugin.
         """
 
+        if not self.activated:return {}
         user_name = str(user.getUserName())
         keywords = {'user_name':str(user_name)}
         view_name = 'sugarcrmgetPropertiesForUser'

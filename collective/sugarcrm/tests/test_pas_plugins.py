@@ -41,6 +41,7 @@ class UnitTest(unittest.TestCase):
         pasplugin.SugarCRMPASPlugin._sugarcrm = _sugarcrm
         pasplugin.SugarCRMPASPlugin._passord_utility = _password
         self.plugin = pasplugin.SugarCRMPASPlugin(id='myplugin')
+        self.plugin.activated = True
     
     def tearDown(self):
         pasplugin.SugarCRMPASPlugin._sugarcrm = self._sugarcrm
@@ -95,6 +96,7 @@ class IntegrationTest(base.TestCase):
                                              utils.SOAP['soap_password'])
         self.sugarcrm_config._updateProperty('activate_service',True)
         self.sugarcrm_config._updateProperty('activate_pasplugin',True)
+        self.plugin.activated = True
 
     def test_authenticateCredentials(self):
         credentials = {'login':'will', 'password':'will'}
