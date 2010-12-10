@@ -1,13 +1,13 @@
-from zope.interface import Interface
-from zope.component import adapts
-from zope.component import getUtility
-from zope.formlib import form
-from zope.interface import implements
-from zope.schema import Int
-from zope.schema import Password
-from zope.schema import TextLine
-from zope.schema import ASCII
+from suds import WebFault
+
+from zope import component
+from zope import formlib
+from zope import interface
+from zope import schema
+
 from zope.app.form.browser.textwidgets import ASCIIWidget
+
+from plone.app.controlpanel.form import ControlPanelForm
 
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
@@ -15,19 +15,16 @@ from Products.CMFDefault.formlib.schema import ProxyFieldProperty
 from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from Products.CMFPlone.utils import safe_hasattr
-
-from plone.app.controlpanel.form import ControlPanelForm
+from Products.statusmessages.interfaces import IStatusMessage
 
 from collective.sugarcrm import SugarCRMMessageFactory as _
 from collective.sugarcrm import interfaces
-from suds import WebFault
-from Products.statusmessages.interfaces import IStatusMessage
 
-class ISugarCRMSchema(Interface):
+class ISugarCRMSchema(interface.Interface):
     """Combined schema for the adapter lookup.
     """
 
-    soap_url = TextLine(title=_(u'label_soap_url',
+    soap_url = schema.TextLine(title=_(u'label_soap_url',
                                 default=u'SugarCRM SOAP URL'),
                         description=_(u'help_soap_url',
                                       default=u"Your SugarCRM SOAP v2 url: "
@@ -35,7 +32,7 @@ class ISugarCRMSchema(Interface):
                         default=None,
                         required=True)
 
-    soap_username = TextLine(title=_(u'label_soap_userid',
+    soap_username = schema.TextLine(title=_(u'label_soap_userid',
                                      default=u"SOAP user login"),
                              description=_(u'help_soap_username',
                                            default=u"it will be used to"
@@ -44,15 +41,23 @@ class ISugarCRMSchema(Interface):
                            default=None,
                            required=True)
 
-    soap_password = Password(title=_(u'label_soap_pass',
+    soap_password = schema.Password(title=_(u'label_soap_pass',
                              default=u'SugarCRM SOAP password'),
                          default=None,
                          required=False)
+    
+    activate_service = schema.Bool(title=_(u'label_activate_service',
+                                   default=u'Activate WebService'),
+                                   default=False)
+
+    activate_pasplugin = schema.Bool(title=_(u'label_activate_pasplugin',
+                                   default=u'Activate PAS Plugin (Authentication, User properties, '),
+                                   default=False)
 
 class SugarCRMControlPanelAdapter(SchemaAdapterBase):
 
-    adapts(IPloneSiteRoot)
-    implements(ISugarCRMSchema)
+    component.adapts(IPloneSiteRoot)
+    interface.implements(ISugarCRMSchema)
 
     def __init__(self, context):
         super(SugarCRMControlPanelAdapter, self).__init__(context)
@@ -80,8 +85,26 @@ class SugarCRMControlPanelAdapter(SchemaAdapterBase):
     def set_soap_username(self, value):
         self.set('soap_username', value)
 
-    soap_username = property(get_soap_username,
-                             set_soap_username)
+    soap_username = property(get_soap_username, set_soap_username)
+
+    def get_activate_service(self):
+        return self.get('activate_service')
+
+    def set_activate_service(self, value):
+        return self.set('activate_service', bool(value))
+
+    activate_service = property(get_activate_service, set_activate_service)
+
+    def get_activate_pasplugin(self):
+        return self.get('activate_pasplugin')
+
+    def set_activate_pasplugin(self, value):
+        if value:
+            self.set_activate_service(True)
+        return self.set('activate_pasplugin', bool(value))
+
+    activate_pasplugin = property(get_activate_pasplugin,
+                                  set_activate_pasplugin)
 
     def get(self, name):
         return getattr(self.context.sugarcrm,name)
@@ -92,7 +115,7 @@ class SugarCRMControlPanelAdapter(SchemaAdapterBase):
 
 class SugarCRMControlPanel(ControlPanelForm):
 
-    form_fields = form.FormFields(ISugarCRMSchema)
+    form_fields = formlib.form.FormFields(ISugarCRMSchema)
     #form_fields['email_from_address'].custom_widget = ASCIIWidget
     label = _("SugarCRM settings")
     description = _("SugarCRM settings for this site.")
@@ -104,7 +127,7 @@ class SugarCRMControlPanel(ControlPanelForm):
             data['soap_password'] = self.context.portal_properties.sugarcrm.soap_password
 
         sugarcrm = interfaces.ISugarCRM(self.context)
-        utils = getUtility(interfaces.IPasswordEncryption)
+        utils = component.getUtility(interfaces.IPasswordEncryption)
 
         login = sugarcrm.login(data['soap_username'],
                                utils.crypt(data['soap_password']))

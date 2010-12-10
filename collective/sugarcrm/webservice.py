@@ -48,8 +48,10 @@ class WebService(object):
             url = pptool.sugarcrm.soap_url.encode('utf-8')
             username = pptool.sugarcrm.soap_username.encode('utf-8')
             password = pptool.sugarcrm.soap_password.encode('utf-8')
+            activated = pptool.sugarcrm.activate_service
 
         self.context = context
+        self.activated = activated
         self.url = url
         self._valid_url = False
         self.username = username
@@ -62,6 +64,7 @@ class WebService(object):
 
     @property
     def client(self):
+        if not self.activated: return
         if self._client is not None:
             return self._client
         client = None
@@ -97,6 +100,7 @@ class WebService(object):
         There are 120 available types on SugarCRM 6. To get types, just print
         print the suds client on current output
         """
+        if not self.activated: return
         if self.client is not None:
             return self.client.factory.create(argument_type)
 
@@ -109,6 +113,7 @@ class WebService(object):
         return info
 
     def login(self, username, password, crypt=False):
+        if not self.activated: return
         if self.client is None: return
 
         user = self.client.factory.create('user_auth')
@@ -132,6 +137,7 @@ class WebService(object):
         return component.getUtility(interfaces.IPasswordEncryption)
 
     def logout(self, session):
+        if not self.activated: return
         if self.client is None: return
         self.client.service.logout(session)
 
@@ -139,6 +145,7 @@ class WebService(object):
     def session(self):
         """Return the session of loggedin portal soap account"""
 
+        if not self.activated: return
         if self.client is None: return
 
         login = self.login(self.username, self.password, crypt=True)
@@ -156,6 +163,7 @@ class WebService(object):
         Return a list of dict with all the content from the response
         """
 
+        if not self.activated: return[]
         if self.client is None: return []
         if session is None: #session as arg
             session = self.session
@@ -180,6 +188,7 @@ class WebService(object):
     def get_entry(self, session=None, module='Contacts',  id='',
                   select_fields=[]):
 
+        if not self.activated: return
         if self.client is None: return
         if session is None: #session as arg
             session = self.session
@@ -206,7 +215,8 @@ class WebService(object):
 
     def get_module_fields(self, session=None, module="Contacts"):
 
-        if self.client is None: return
+        if not self.activated: return []
+        if self.client is None: return []
         if session is None: #session as arg
             session = self.session
         if session is None: #session is invalid

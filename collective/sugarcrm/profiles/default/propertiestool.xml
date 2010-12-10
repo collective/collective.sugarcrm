@@ -5,5 +5,7 @@
   <property name="soap_url" type="string"></property>
   <property name="soap_username" type="string"></property>
   <property name="soap_password" type="string"></property>
+  <property name="activate_service" type="boolean">False</property>
+  <property name="activate_pasplugin" type="boolean">False</property>
  </object>
 </object>
