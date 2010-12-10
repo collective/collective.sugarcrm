@@ -191,7 +191,7 @@ class WebService(object):
             if module in self._module_fields:
                 fields = self._module_fields[module]
             else:
-                fields = self._get_module_fields(session=str(session),
+                fields = self.get_module_fields(session=str(session),
                                                  module=str(module))
             select_fields = [field.name for field in fields]
 
