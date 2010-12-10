@@ -8,13 +8,12 @@ class FakeSugarCRM(object):
                 offset="0", max="100"):
         if module!='Users':
             return []
-        if session is None:
-            return []
         if not query_string:
             return []
         results = []
         if query_string == 'will':
-            pass
+            results.append({'user_name':'will','email_address':'will@sugarcrm.com',
+                            'first_name':u'Will', 'last_name':u'DUPONT'})
         return results
 
     def login(self, username, password, crypt=False):
@@ -94,6 +93,8 @@ class IntegrationTest(base.TestCase):
                                              utils.SOAP['soap_username'])
         self.sugarcrm_config._updateProperty('soap_password',
                                              utils.SOAP['soap_password'])
+        self.sugarcrm_config._updateProperty('activate_service',True)
+        self.sugarcrm_config._updateProperty('activate_pasplugin',True)
 
     def test_authenticateCredentials(self):
         credentials = {'login':'will', 'password':'will'}

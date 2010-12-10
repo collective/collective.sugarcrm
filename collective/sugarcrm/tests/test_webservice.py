@@ -61,6 +61,7 @@ class UnitTest(unittest.TestCase):
     def setUp(self):
         self.ws = WebService(None)
         self.ws._client = FakeClient()
+        self.ws.activated = True
         def password():
             return Password()
         self.ws.password_utility = password
@@ -71,7 +72,7 @@ class UnitTest(unittest.TestCase):
 
     def test_create(self):
         created = self.ws.create('user_auth')
-        self.failUnless(type(created)==FakeUserAuth)
+        self.failUnless(type(created)==FakeUserAuth, created)
 
     def test_login(self):
         login = self.ws.login('will', 'will')
@@ -109,7 +110,8 @@ class IntegrationTest(unittest.TestCase):
         self.ws = WebService(None,
                              url=self.url,
                         username=self.username,
-                        password=self.password)
+                        password=self.password,
+                        activated=True)
         gsm = getGlobalSiteManager()
         passwordUtility = Password()
         gsm.registerUtility(passwordUtility, interfaces.IPasswordEncryption)

@@ -39,7 +39,7 @@ class WebService(object):
     interface.implements(interfaces.IComplexArgFactory,
                          interfaces.ISugarCRM)
 
-    def __init__(self, context, url="", username="", password=""):
+    def __init__(self, context, url="", username="", password="", activated=False):
         """If context is not, you must provide url"""
 
         if context is not None:
