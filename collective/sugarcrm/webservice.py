@@ -225,18 +225,18 @@ class WebServiceCached(WebService):
     @property
     @ram.cache(session_cache_key)
     def session(self):
-        return super(WebService, self).session
+        return super(WebServiceCached, self).session
 
     @ram.cache(get_entry_cache_key)
     def get_entry(self, session=None, module='Contacts',  id='',
                   select_fields=[]):
-        return super(WebService, self).get_entry(session=session,
+        return super(WebServiceCached, self).get_entry(session=session,
                                                  module=module,
                                                  id=id,
                                                  select_fields=select_fields)
 
     @ram.cache(get_module_fields_cache_key)
     def get_module_fields(self, session=None, module="Contacts"):
-        return super(WebService, self).get_module_fields(session=session,
+        return super(WebServiceCached, self).get_module_fields(session=session,
                                                          module=module)
 
