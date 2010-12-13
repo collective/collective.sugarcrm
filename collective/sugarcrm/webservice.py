@@ -202,7 +202,7 @@ class WebService(object):
             else:
                 fields = self.get_module_fields(session=str(session),
                                                  module=str(module))
-            select_fields = [field.name for field in fields]
+            select_fields = [field for field in fields]
 
         results = self.client.service.get_entry(session, module, id,
                                                 select_fields)
@@ -225,7 +225,7 @@ class WebService(object):
         results = self.client.service.get_module_fields(session, module)
         module_fields = results.module_fields
 
-        fields = [field for field in module_fields]
+        fields = [str(field.name) for field in module_fields]
         self._module_fields[module] = fields
 
         return fields
