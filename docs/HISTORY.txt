@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0b2 (unreleased)
+1.0b2 (2010-12-13)
 ------------------
 
 - PAS plugin: Implements IUserEnumerationPlugin and IPropertiesPlugin.
