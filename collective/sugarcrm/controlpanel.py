@@ -125,7 +125,7 @@ class SugarCRMControlPanel(ControlPanelForm):
             password = str(self.context.portal_properties.sugarcrm.soap_password)
         if not password or not data.get('activate_service', False):
             return
-        self.context.plone_log(password)
+
         sugarcrm = interfaces.ISugarCRM(self.context)
         utils = component.getUtility(interfaces.IPasswordEncryption)
 
