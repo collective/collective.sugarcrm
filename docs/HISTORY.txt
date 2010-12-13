@@ -8,6 +8,9 @@ Changelog
   Manage cache with Cacheable api.
   [toutpt]
 
+- Add activate options (webservice, pasplugin) in controlpanel.
+  [toutpt]
+
 1.0b1 (2010-10-07)
 ------------------
 
