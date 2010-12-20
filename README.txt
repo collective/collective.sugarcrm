@@ -14,12 +14,15 @@ Useable in production
 tests
 -----
 
-Tests are run with a trial URL
+Integration tests are run with a trial URL
 If it is not available, please fill the demand for a new demo at
 http://www.sugarcrm.com/crm/ondemand_eval.html and export the URL into
 environnement:
 
   export SUGARCRM_SOAP_URL="NEW TRIAL URL"
+
+you can exclude integration tests with sugarcrm by using
+use ./bin/test -t UnitTest
 
 Components
 ==========
