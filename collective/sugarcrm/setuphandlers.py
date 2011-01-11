@@ -27,6 +27,9 @@ def setupPasPlugin(context):
     for i in range(plugin_index):
         pas.plugins.movePluginsUp(iface, [plugin_id])
 
+    #set _activated var to None to reactivate pas plugin
+    provider._activated = None
+
 def uninstallPasPlugin(context):
     if context.readDataFile('sugarcrm.txt') is None:
         return
