@@ -1,0 +1,14 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="collective.sugarcrm">
+
+  <genericsetup:upgradeStep
+    title="Upgrade collective.sugarcrm 1-2"
+    description=""
+    source="1"
+    destination="2"
+    handler=".upgrades.upgrade_1_to_2"
+    profile="collective.sugarcrm:default"/>
+
+</configure>

@@ -1,0 +1,22 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="collective.sugarcrm">
+
+  <genericsetup:registerProfile
+      name="default"
+      title="collective.sugarcrm"
+      directory="profiles/default"
+      description="Installs the collective.sugarcrm package"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:importStep
+        name="pasplugin.sugarcrm"
+        title="collective.sugarcrm:setupPasPlugin"
+        description="Setup Pas plugin"
+        handler=".setuphandlers.setupPasPlugin">
+    <depends name="plone-final" />
+  </genericsetup:importStep>
+
+</configure>

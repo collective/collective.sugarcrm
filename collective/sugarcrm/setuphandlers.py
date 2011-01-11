@@ -13,10 +13,14 @@ def setupPasPlugin(context):
     if not plugin_id in pas.objectIds():
         manager = plugin.AuthPlugin(plugin_id, plugin_title)
         pas._setObject(plugin_id, manager)
-        provider = pas[plugin_id]
-        provider.manage_activateInterfaces(['IAuthenticationPlugin',
-                                            'IPropertiesPlugin',
-                                            'IUserEnumerationPlugin'])
+
+    provider = pas[plugin_id]
+    provider.manage_activateInterfaces(['IAuthenticationPlugin',
+                                        'IUserEnumerationPlugin',
+                                        'IPropertiesPlugin'])
+
+    #because default plone properties plugin mask any other, 
+    #you must place it before it
 
 
 def uninstallPasPlugin(context):

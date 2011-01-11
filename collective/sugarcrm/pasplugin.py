@@ -6,7 +6,7 @@ from Products.PluggableAuthService import plugins
 from Products.PluggableAuthService import interfaces
 from Products.PluggableAuthService import utils
 
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from OFS.Cache import Cacheable
 
 from zope import component
@@ -15,13 +15,17 @@ from zope import interface
 from collective.sugarcrm.interfaces import IPasswordEncryption, ISugarCRM
 from AccessControl import ClassSecurityInfo
 
+class ISugarCRMPASPlugin(interface.Interface):
+    """Marker interface"""
+
 class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
     """This plugin try to authenticate the user
     with the login method of the sugarcrm webservice"""
     
     interface.implements(interfaces.plugins.IAuthenticationPlugin,
                          interfaces.plugins.IUserEnumerationPlugin,
-                         interfaces.plugins.IPropertiesPlugin)
+                         interfaces.plugins.IPropertiesPlugin,
+                         ISugarCRMPASPlugin)
 
     meta_type = 'SugarCRM IAuthenticationPlugin'
     security = ClassSecurityInfo()
@@ -246,4 +250,3 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
                      )
 
 InitializeClass(AuthPlugin)
-

@@ -25,21 +25,6 @@
       provides=".interfaces.ISugarCRM"
       factory=".webservice.WebServiceCached"
   />
-
-  <genericsetup:registerProfile
-      name="default"
-      title="collective.sugarcrm"
-      directory="profiles/default"
-      description="Installs the collective.sugarcrm package"
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      />
-  <genericsetup:importStep
-        name="pasplugin.sugarcrm"
-        title="collective.sugarcrm:setupPasPlugin"
-        description="Setup Pas plugin"
-        handler=".setuphandlers.setupPasPlugin">
-    <depends name="plone-final" />
-  </genericsetup:importStep>
   <!-- -*- extra stuff goes here -*- -->
 
   <adapter factory=".controlpanel.SugarCRMControlPanelAdapter" />
@@ -54,11 +39,15 @@
       permission="cmf.ManagePortal"
       />
 
-<!-- PORTLET CONTACT -->
+  <!-- PORTLET CONTACT -->
   <utility
      component=".portlet.contact"
      provides="collective.portlet.contact.interfaces.IPortletContactUtility"
      name="sugarcrm"
      zcml:condition="installed collective.portlet.contact"/>
+
+  <!-- INSTALL AND UPGRADES -->
+  <include file="profiles.zcml" />
+  <include file="upgrades.zcml" />
 
 </configure>
