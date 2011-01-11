@@ -8,6 +8,7 @@
             condition_expr=""
             url_expr="string:${portal_url}/@@sugarcrm-controlpanel"
             visible="True" 
+            icon_expr="++resource++collective.sugarcrm.gif"
             i18n:attributes="title">
         <permission>Manage portal</permission>
  </configlet>
