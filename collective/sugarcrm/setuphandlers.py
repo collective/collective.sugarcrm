@@ -21,7 +21,11 @@ def setupPasPlugin(context):
 
     #because default plone properties plugin mask any other, 
     #you must place it before it
-
+    iface = pas.plugins._getInterfaceFromName('IPropertiesPlugin')
+    pluginids = pas.plugins.listPluginIds(iface)
+    plugin_index = pluginids.index(plugin_id)
+    for i in range(plugin_index):
+        pas.plugins.movePluginsUp(iface, [plugin_id])
 
 def uninstallPasPlugin(context):
     if context.readDataFile('sugarcrm.txt') is None:
