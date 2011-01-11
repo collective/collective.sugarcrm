@@ -13,18 +13,18 @@
     provides=".interfaces.IPasswordEncryption"
     />
 
-  <!-- REMOVE CACHE
   <adapter
       for="*"
       provides=".interfaces.ISugarCRM"
       factory=".webservice.WebService"
   />
-  -->
+  <!-- REMOVE CACHE
   <adapter
       for="*"
       provides=".interfaces.ISugarCRM"
       factory=".webservice.WebServiceCached"
   />
+  -->
   <!-- -*- extra stuff goes here -*- -->
 
   <adapter factory=".controlpanel.SugarCRMControlPanelAdapter" />

@@ -14,6 +14,7 @@ from zope import interface
 
 from collective.sugarcrm.interfaces import IPasswordEncryption, ISugarCRM
 from AccessControl import ClassSecurityInfo
+from Products.CMFCore.utils import getToolByName
 
 class ISugarCRMPASPlugin(interface.Interface):
     """Marker interface"""
@@ -33,7 +34,7 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
     def __init__(self, id, title=None):
         self.id = id
         self.title = title
-        self._activated = False
+        self._activated = None
 
     def _passord_utility(self):
         return component.getUtility(IPasswordEncryption)
@@ -41,14 +42,13 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
     def _sugarcrm(self):
         return ISugarCRM(self)
 
-    def get_activated(self):
+    @property
+    def activated(self):
         """Return True if webservice and pasplugin are activated"""
-        return self._activated
-    
-    def set_activated(self, value):
-        self._activated = bool(value)
-
-    activated = property(get_activated, set_activated)
+        if self._activated is not None:
+            return self._activated
+        pp = getToolByName(self, 'portal_properties').sugarcrm
+        return bool(pp.activate_pasplugin)
 
     security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
