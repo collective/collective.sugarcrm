@@ -35,6 +35,7 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
         self.id = id
         self.title = title
         self._activated = None
+        self._v_blacklist_ids = []
 
     def _passord_utility(self):
         return component.getUtility(IPasswordEncryption)
@@ -59,7 +60,12 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
         password = credentials.get('password')
 
         if not login or not password:
-            return None
+            return
+
+        if self.isInBlacklist('%s-%s'%(login, password)):
+            return
+
+        logger.info('authenticateCredentials not cached %s'%login)
 
         utility = self._passord_utility()
         encrypted_password = utility.crypt(password)
@@ -68,6 +74,7 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
         session = sugarcrm.login(login, encrypted_password)
 
         if session is None:
+            self.addToBlacklist('%s-%s'%(login,password))
             return
 
         return login, login
@@ -92,18 +99,21 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
         if isinstance( login, basestring ):
             login = [ str(login) ]
 
+        lookup_ids = []
+        if login is not None and id is None:
+            lookup_ids = login
+        elif id is not None and login is None:
+            lookup_ids = id
+
         res = {}
-        if id:
-            for i in id:
-                if i in res.keys():
-                    continue
-                res[i] = service.search(query_string=i, module='Users')
-        elif login:
-            for i in login:
-                if i in res.keys():
-                    continue
-                res[i] = service.search(query_string=i, module='Users')
-        
+        for i in lookup_ids:
+            if i in res.keys():
+                continue
+            if self.isInBlacklist(i):
+                continue
+            logger.info('enumerateUsers not cached %s'%i)
+            res[i] = service.search(query_string=i, module='Users')
+
         user_info = []
         plugin_id = self.getId()
         e_url = '%s/manage_users' % plugin_id
@@ -116,6 +126,10 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
                       , 'editurl' : '%s?%s' % (e_url, qs)
                    } 
             user_info.append(info)
+
+        if len(user_info) == 0:
+            for i in lookup_ids:
+                self.addToBlacklist(i)
 
         return user_info
 
@@ -139,6 +153,17 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
 
         return properties
 
+    def addToBlacklist(self, key):
+        if not hasattr(self, '_v_blacklist_ids'):
+            setattr(self, '_v_blacklist_ids', [])
+        self._v_blacklist_ids.append(key)
+    
+    def isInBlacklist(self, key):
+        if not hasattr(self, '_v_blacklist_ids'):
+            setattr(self, '_v_blacklist_ids', [])
+        return key in self._v_blacklist_ids
+
+
 class AuthPlugin(SugarCRMPASPlugin, Cacheable):
     """Cacheable Version"""
     security = ClassSecurityInfo()
@@ -155,22 +180,34 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
 
         if not self.activated:return []
         view_name = 'sugarcrmenumerateUsers'
+        logger.info('enumerateUsers cached')
 
         if isinstance( id, basestring ):
             id = [ str(id) ]
 
         if isinstance( login, basestring ):
             login = [ str(login) ]
-        
+
+        lookup_ids = []
+        if login is not None and id is None:
+            lookup_ids = login
+        elif id is not None and login is None:
+            lookup_ids = id
+
         # Look in the cache first...
-        keywords = {'id' : id}
+        if len(lookup_ids)==0:
+            return []
+
+        keywords = {'id' : lookup_ids[0]}
+
         cached_info = self.ZCacheable_get( view_name=view_name
                                          , keywords=keywords
                                          , default=None
                                          )
+
         if cached_info is not None:
             return tuple(cached_info)
-        
+
         user_info = SugarCRMPASPlugin.enumerateUsers(self, id=id
                       , login=login
                       , exact_match=exact_match
@@ -180,7 +217,10 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
                       )
 
         # Put the computed value into the cache
-        self.ZCacheable_set(user_info, view_name=view_name, keywords=keywords)
+        if user_info:
+            self.ZCacheable_set(user_info,
+                                view_name=view_name,
+                                keywords=keywords)
 
         return tuple( user_info )
 
@@ -189,6 +229,7 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
         """ See IAuthenticationPlugin.
         """
         if not self.activated:return
+        logger.info('authenticateCredentials cached')
 
         login = credentials.get('login')
         password = credentials.get('password')
@@ -200,7 +241,7 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
         encrypted_password = utility.crypt(password)
         view_name = 'sugarcrmauthenticateCredentials'
         keywords = { 'login' : login, 'password' : password}
-        
+
         cached_info = self.ZCacheable_get( view_name=view_name
                                          , keywords=keywords
                                          , default=None
@@ -208,6 +249,7 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
         if cached_info is not None:
             return tuple(cached_info)
 
+        logger.info('auth nothing in cache')
         res = SugarCRMPASPlugin.authenticateCredentials(self, credentials)
         if res:
             self.ZCacheable_set(res, view_name=view_name, keywords=keywords)
