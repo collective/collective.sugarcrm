@@ -4,8 +4,13 @@ Changelog
 1.0b3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Install now activate the plugin on all provided interfaces. Install step
+  reoder the sugarcrm properties pas plugin to be the first. In other case the
+  plugin is not used by default
+  [toutpt]
 
+- Add upgrade step
+  [toutpt]
 
 1.0b2 (2010-12-13)
 ------------------
