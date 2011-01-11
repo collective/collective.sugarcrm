@@ -8,11 +8,23 @@ def setupPasPlugin(context):
         return
 
     portal = context.getSite()
-
     pas = portal.acl_users
 
     if not plugin_id in pas.objectIds():
         manager = plugin.AuthPlugin(plugin_id, plugin_title)
         pas._setObject(plugin_id, manager)
         provider = pas[plugin_id]
-        provider.manage_activateInterfaces(['IAuthenticationPlugin'])
+        provider.manage_activateInterfaces(['IAuthenticationPlugin',
+                                            'IPropertiesPlugin',
+                                            'IUserEnumerationPlugin'])
+
+
+def uninstallPasPlugin(context):
+    if context.readDataFile('sugarcrm.txt') is None:
+        return
+
+    portal = context.getSite()
+    pas = portal.acl_users
+    if plugin_id in pas.objectIds():
+        pas[plugin_id].manage_activateInterfaces([])
+        pas.manage_delObjects([plugin_id])
