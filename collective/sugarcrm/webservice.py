@@ -210,7 +210,7 @@ class WebService(object):
 
         info = self._entry2dict(entry)
 
-        logger.debug('ws.get_entry(%s, %s) -> %s'%(module, id, info))
+        #logger.debug(u'ws.get_entry(%s, %s) -> %s'%(module, id, info))
         return info
 
     def get_module_fields(self, session=None, module="Contacts"):
