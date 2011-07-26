@@ -12,6 +12,9 @@ Changelog
 - Add upgrade step
   [toutpt]
 
+- Fix issue with cache when the service return None
+  [toutpt]
+
 1.0b2 (2010-12-13)
 ------------------
 

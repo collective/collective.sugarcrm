@@ -202,10 +202,10 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
 
         cached_info = self.ZCacheable_get( view_name=view_name
                                          , keywords=keywords
-                                         , default=None
+                                         , default="not_in_cache"
                                          )
 
-        if cached_info is not None:
+        if cached_info != "not_in_cache":
             return tuple(cached_info)
 
         user_info = SugarCRMPASPlugin.enumerateUsers(self, id=id
@@ -216,11 +216,9 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
                       , **kw
                       )
 
-        # Put the computed value into the cache
-        if user_info:
-            self.ZCacheable_set(user_info,
-                                view_name=view_name,
-                                keywords=keywords)
+        self.ZCacheable_set(user_info,
+                            view_name=view_name,
+                            keywords=keywords)
 
         return tuple( user_info )
 
@@ -244,15 +242,14 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
 
         cached_info = self.ZCacheable_get( view_name=view_name
                                          , keywords=keywords
-                                         , default=None
+                                         , default="not_in_cache"
                                          )
-        if cached_info is not None:
+        if cached_info != "not_in_cache":
             return tuple(cached_info)
 
         logger.info('auth nothing in cache')
         res = SugarCRMPASPlugin.authenticateCredentials(self, credentials)
-        if res:
-            self.ZCacheable_set(res, view_name=view_name, keywords=keywords)
+        self.ZCacheable_set(res, view_name=view_name, keywords=keywords)
 
         return res
 
@@ -267,17 +264,16 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
         view_name = 'sugarcrmgetPropertiesForUser'
         cached_properties = self.ZCacheable_get( view_name=view_name
                                          , keywords=keywords
-                                         , default=None
+                                         , default="not_in_cache"
                                          )
-        if cached_properties:
+        if cached_properties != "not_in_cache":
             return cached_properties
         
         properties = SugarCRMPASPlugin.getPropertiesForUser(self, user,
                                                             request=request)
 
-        if properties:
-            self.ZCacheable_set(properties, view_name=view_name,
-                                keywords=keywords)
+        self.ZCacheable_set(properties, view_name=view_name,
+                            keywords=keywords)
 
         return properties
     #
