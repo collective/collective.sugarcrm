@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0b3 (unreleased)
+1.0b3 (2011-07-26)
 ------------------
 
 - Install now activate the plugin on all provided interfaces. Install step
