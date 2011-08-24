@@ -4,7 +4,8 @@ from zope import component
 from zope import interface
 from Products.CMFCore.utils import getToolByName
 import logging
-from z3c.suds import get_suds_client
+from z3c_suds import get_suds_client
+from suds.client import Client
 from plone.memoize import ram
 from time import time
 from suds import WebFault
@@ -69,7 +70,9 @@ class WebService(object):
             return self._client
         client = None
         try:
-            client = get_suds_client(self.url+'?wsdl', context=self.context)
+            url = self.url+'?wsdl'
+            #fix 404 exception on login: http://stackoverflow.com/questions/6499770/why-am-i-getting-exception-404-unot-found-with-suds
+            client = get_suds_client(url, context=self.context, location=url)
         except ValueError, e:
             logger.error("invalid SOAP URL: client instanciation fail")
         valid = True #try now to validate the existing client

@@ -7,6 +7,9 @@ Changelog
 - Fix Plone4.1 compatibility by including Products.CMFCore's permissions.zcml file
   [toutpt]
 
+- Fix 404 internal exception on login on some configurations
+  [toutpt]
+
 1.0b3 (2011-07-26)
 ------------------
 
