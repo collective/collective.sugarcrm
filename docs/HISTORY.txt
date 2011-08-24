@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0b4 (unreleased)
+1.0b4 (2011-08-24)
 ------------------
 
 - Fix Plone4.1 compatibility by including Products.CMFCore's permissions.zcml file
