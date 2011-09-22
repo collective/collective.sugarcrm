@@ -119,6 +119,8 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
         e_url = '%s/manage_users' % plugin_id
         for i in res.keys():
             webinfo = res[i]
+            if not webinfo:
+                continue
             qs = 'user_id=%s' % i
             info = { 'id' : i
                       , 'login' : i

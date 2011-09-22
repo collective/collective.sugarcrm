@@ -4,7 +4,8 @@ Changelog
 1.0b5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- fix a bug in enumerateUsers that break registration form.
+  [toutpt]
 
 
 1.0b4 (2011-08-24)
