@@ -4,8 +4,10 @@ Changelog
 1.0b6 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- force query_string to be a string
+  [toutpt]
+- fix error dict object has no attribute ...  when using z3c.form with getContent returning a dict
+  [toutpt]
 
 1.0b5 (2011-09-23)
 ------------------
