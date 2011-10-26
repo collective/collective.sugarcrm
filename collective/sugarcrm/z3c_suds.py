@@ -13,7 +13,7 @@ except ImportError:
 def get_suds_client(wsdl_uri, **kwargs):
 
     context = kwargs.pop('context', None)
-    if context is None:
+    if context is None or type(context) == dict:
         context = _get_default_context()
 
     if context is None:
