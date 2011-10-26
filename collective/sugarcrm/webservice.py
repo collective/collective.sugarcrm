@@ -172,6 +172,8 @@ class WebService(object):
             session = self.session
         if session is None: #session is invalid
             return []
+        if type(query_string) == unicode:
+            query_string = query_string.encode('utf-8')
 
         results = self.client.service.search_by_module(session,
                                                        query_string,
