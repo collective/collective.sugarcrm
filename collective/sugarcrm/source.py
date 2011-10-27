@@ -93,9 +93,8 @@ class ContactQuerySource(object):
                                          module=self.sugarcrm_module,
                                          max=25)
         terms = [self.buildTerm(i) for i in results]
-        terms_title = [term.title for term in terms]
 
-        logger.debug("source.search(%s) -> %s"%(query_string, terms_title))
+        logger.debug("source.search(%s) -> %s"%(query_string, len(terms)))
         return SimpleVocabulary(terms)
 
 class ContactSourceBinder(object):
