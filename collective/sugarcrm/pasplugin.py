@@ -182,7 +182,7 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
 
         if not self.activated:return []
         view_name = 'sugarcrmenumerateUsers'
-        logger.info('enumerateUsers cached')
+        #logger.info('enumerateUsers cached')
 
         if isinstance( id, basestring ):
             id = [ str(id) ]
@@ -229,7 +229,7 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
         """ See IAuthenticationPlugin.
         """
         if not self.activated:return
-        logger.info('authenticateCredentials cached')
+        #logger.info('authenticateCredentials cached')
 
         login = credentials.get('login')
         password = credentials.get('password')
