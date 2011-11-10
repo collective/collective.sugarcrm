@@ -15,8 +15,14 @@ class Contact(object):
         sugarcrm = interfaces.ISugarCRM(context)
         results = sugarcrm.search(query_string=q,
                         module="Contacts", max=limit)
-        item_str = "%(name)s - %(account_name)s|%(id)s"
-        items = [item_str%item for item in results]
+
+        items = []
+        for item in results:
+            if 'account_name' in item:
+                item_str = "%(name)s - %(account_name)s|%(id)s"
+            else:
+                item_str = "%(name)s|%(id)s"
+            items.append(item_str%item)
 
         return '\n'.join(items)
 
