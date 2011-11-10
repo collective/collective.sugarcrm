@@ -1,9 +1,12 @@
 Changelog
 =========
 
-1.0b6 (unreleased)
-------------------
+1.0 (2011-11-10)
+----------------
 
+- fix portlet autocomplete if a contact has no account
+- remove logs on cached entry (just keep non cached entry in info)
+- fix unicode decode error due to log
 - force query_string to be a string
   [toutpt]
 - fix error dict object has no attribute ...  when using z3c.form with getContent returning a dict
