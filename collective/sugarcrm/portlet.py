@@ -51,6 +51,6 @@ class Contact(object):
                 'mail': encode_email(c.get('email1',''), c.get('email1','')),
                 'employeetype': c.get('title',''),
                 'uid': uniq_id,
-                'photourl': ''}
+                'photourl': jpegurl}
 
 contact = Contact()
