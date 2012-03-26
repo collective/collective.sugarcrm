@@ -17,7 +17,7 @@ tests
 Integration tests are run with a trial URL
 If it is not available, please fill the demand for a new demo at
 http://www.sugarcrm.com/crm/ondemand_eval.html and export the URL into
-environnement:
+environnement::
 
   export SUGARCRM_SOAP_URL="NEW TRIAL URL"
 
@@ -74,15 +74,16 @@ Companies
 
 |makinacom|_
 
-  * `Planet Makina Corpus <http://www.makina-corpus.org>`_
-  * `Contact us <mailto:python@makina-corpus.org>`_
+* `Planet Makina Corpus <http://www.makina-corpus.org>`_
+* `Contact us <mailto:python@makina-corpus.org>`_
 
 
 Authors
+-------
 
-  - JeanMichel FRANCOIS aka toutpt <toutpt@gmail.com>
+- JeanMichel FRANCOIS aka toutpt <toutpt@gmail.com>
 
-Contributors
+.. Contributors
 
 .. |makinacom| image:: http://depot.makina-corpus.org/public/logo.gif
 .. _makinacom:  http://www.makina-corpus.com
