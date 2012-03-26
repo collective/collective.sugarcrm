@@ -10,8 +10,7 @@ Changelog
 1.1 (2012-03-26)
 ----------------
 
-- Nothing changed yet.
-
+- Fix photo url in portlet
 
 1.0 (2011-11-10)
 ----------------
