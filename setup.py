@@ -12,9 +12,11 @@ setup(name='collective.sugarcrm',
       # http://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",
+        "Framework :: Plone :: 4.0",
+        "Framework :: Plone :: 4.1",
         "Programming Language :: Python",
         ],
-      keywords='',
+      keywords='sugarcrm Plone',
       author='JeanMichel FRANCOIS aka toutpt',
       author_email='toutpt@gmail.com',
       url='https://github.com/collective/collective.sugarcrm',
@@ -31,7 +33,6 @@ setup(name='collective.sugarcrm',
       ],
       entry_points="""
       # -*- Entry points: -*-
-
       [z3c.autoinclude.plugin]
       target = plone
       """,
