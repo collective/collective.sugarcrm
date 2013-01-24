@@ -1,11 +1,12 @@
 from collective.portlet.contact.interfaces import IPortletContactUtility
 from collective.sugarcrm import interfaces
 from zope import interface
-from collective.portlet.contact.utils import encode_email
+#from collective.portlet.contact.utils import encode_email
 from Products.CMFCore.utils import getToolByName
 
+
 class Contact(object):
-    """Utility class for collective.portlet.contact backend. It use 
+    """Utility class for collective.portlet.contact backend. It use
     'Contacts' module."""
     interface.implements(IPortletContactUtility)
 
@@ -22,7 +23,7 @@ class Contact(object):
                 item_str = "%(name)s - %(account_name)s|%(id)s"
             else:
                 item_str = "%(name)s|%(id)s"
-            items.append(item_str%item)
+            items.append(item_str % item)
 
         return '\n'.join(items)
 
@@ -31,7 +32,7 @@ class Contact(object):
 
         urltool = getToolByName(context, 'portal_url')
         sugarcrm = interfaces.ISugarCRM(context)
-        c = sugarcrm.get_entry(module="Contacts",id=uniq_id)
+        c = sugarcrm.get_entry(module="Contacts", id=uniq_id)
 
         if not c:
             return {'fullname': '',
@@ -41,15 +42,15 @@ class Contact(object):
                 'uid': uniq_id,
                 'photourl': ''}
 
-        jpegurl = urltool() + '/@@ldapJpegPhoto?uid='+uniq_id
+        jpegurl = urltool() + '/@@ldapJpegPhoto?uid=' + uniq_id
 
-        fullname = ' '.join((c.get('first_name','') or '',
-                             c.get('last_name','') or '')).strip()
-
+        fullname = ' '.join((c.get('first_name', '') or '',
+                             c.get('last_name', '') or '')).strip()
+        email = c.get('email1', '')
         return {'fullname': fullname,
-                'phonenumber': c.get('phone_work',''),
-                'mail': encode_email(c.get('email1',''), c.get('email1','')),
-                'employeetype': c.get('title',''),
+                'phonenumber': c.get('phone_work', ''),
+                'mail': '<a href="mailto:%s">%s</a>' % (email, email),
+                'employeetype': c.get('title', ''),
                 'uid': uniq_id,
                 'photourl': jpegurl}
 
