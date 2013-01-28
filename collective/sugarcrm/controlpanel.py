@@ -5,51 +5,56 @@ from zope import formlib
 from zope import interface
 from zope import schema
 
-from zope.app.form.browser.textwidgets import ASCIIWidget
-
 from plone.app.controlpanel.form import ControlPanelForm
 
-from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
-from Products.CMFDefault.formlib.schema import ProxyFieldProperty
 from Products.CMFDefault.formlib.schema import SchemaAdapterBase
 from Products.CMFPlone.interfaces import IPloneSiteRoot
-from Products.CMFPlone.utils import safe_hasattr
 from Products.statusmessages.interfaces import IStatusMessage
 
 from collective.sugarcrm import SugarCRMMessageFactory as _
 from collective.sugarcrm import interfaces
 
+
 class ISugarCRMSchema(interface.Interface):
     """Combined schema for the adapter lookup.
     """
 
-    soap_url = schema.ASCIILine(title=_(u'label_soap_url',
-                                default=u'SugarCRM SOAP URL'),
-                        description=_(u'help_soap_url',
-                                      default=u"Your SugarCRM SOAP v2 url: "
-                              u"http://mysugardomain.com/service/v2/soap.php"),
-                        required=True)
+    soap_url = schema.ASCIILine(
+        title=_(u'label_soap_url', default=u'SugarCRM SOAP URL'),
+        description=_(
+            u'help_soap_url',
+            default=u"Your SugarCRM SOAP v2 url: "\
+                u"http://mysugardomain.com/service/v2/soap.php"
+        ),
+        required=True,
+    )
 
-    soap_username = schema.ASCIILine(title=_(u'label_soap_userid',
-                                     default=u"SOAP user login"),
-                             description=_(u'help_soap_username',
-                                           default=u"it will be used to"
-                                   u"authenticate the portal actions done with"
-                                   u"ISugarCRM component"),
-                           required=True)
+    soap_username = schema.ASCIILine(
+        title=_(u'label_soap_userid', default=u"SOAP user login"),
+        description=_(
+            u'help_soap_username',
+            default=u"it will be used to authenticate the portal actions done"\
+                u"with ISugarCRM component"),
+        required=True,
+    )
 
-    soap_password = schema.Password(title=_(u'label_soap_pass',
-                             default=u'SugarCRM SOAP password'),
-                         required=False)
+    soap_password = schema.Password(
+        title=_(u'label_soap_pass', default=u'SugarCRM SOAP password'),
+        required=False
+    )
 
-    activate_service = schema.Bool(title=_(u'label_activate_service',
-                                   default=u'Activate WebService'),
-                                   default=False)
+    activate_service = schema.Bool(
+        title=_(u'label_activate_service', default=u'Activate WebService'),
+        default=False
+    )
 
-    activate_pasplugin = schema.Bool(title=_(u'label_activate_pasplugin',
-                                   default=u'Activate PAS Plugin (Authentication, User properties) '),
-                                   default=False)
+    activate_pasplugin = schema.Bool(
+        title=_(u'label_activate_pasplugin',
+        default=u'Activate PAS Plugin (Authentication, User properties) '),
+        default=False
+    )
+
 
 class SugarCRMControlPanelAdapter(SchemaAdapterBase):
 
@@ -105,11 +110,12 @@ class SugarCRMControlPanelAdapter(SchemaAdapterBase):
                                   set_activate_pasplugin)
 
     def get(self, name):
-        return getattr(self.context.sugarcrm,name)
+        return getattr(self.context.sugarcrm, name)
 
     def set(self, name, value):
         if value and value != self.get(name):
             setattr(self.context.sugarcrm, name, value)
+
 
 class SugarCRMControlPanel(ControlPanelForm):
 
@@ -122,7 +128,8 @@ class SugarCRMControlPanel(ControlPanelForm):
     def _on_save(self, data=None):
         password = data.get('soap_password', '')
         if type(password) not in (unicode, str) or not password:
-            password = str(self.context.portal_properties.sugarcrm.soap_password)
+            sheet = self.context.portal_properties.sugarcrm
+            password = str(sheet.soap_password)
         if not password or not data.get('activate_service', False):
             return
 
@@ -133,4 +140,5 @@ class SugarCRMControlPanel(ControlPanelForm):
                                utils.crypt(password))
         if not login:
             message = _("Invalid credentials or URL.")
-            IStatusMessage(self.request).addStatusMessage(message, type='error')
+            status = IStatusMessage(self.request)
+            status.addStatusMessage(message, type='error')
