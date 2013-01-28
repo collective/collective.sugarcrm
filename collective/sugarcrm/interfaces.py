@@ -14,7 +14,7 @@ class ISugarCRM(interface.Interface):
         """Return an entry defined by the id with all fields"""
 
     def search(session=None, query_string='', module='Contacts', offset=0,
-                           max=None):
+               max=None):
         """Search for entry from the specified module.
         By default, search for contacts"""
 

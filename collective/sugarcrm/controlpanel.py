@@ -1,5 +1,3 @@
-from suds import WebFault
-
 from zope import component
 from zope import formlib
 from zope import interface
@@ -24,8 +22,8 @@ class ISugarCRMSchema(interface.Interface):
         title=_(u'label_soap_url', default=u'SugarCRM SOAP URL'),
         description=_(
             u'help_soap_url',
-            default=u"Your SugarCRM SOAP v2 url: "\
-                u"http://mysugardomain.com/service/v2/soap.php"
+            default=(u"Your SugarCRM SOAP v2 url:"
+                     u"http://mysugardomain.com/service/v2/soap.php")
         ),
         required=True,
     )
@@ -34,8 +32,8 @@ class ISugarCRMSchema(interface.Interface):
         title=_(u'label_soap_userid', default=u"SOAP user login"),
         description=_(
             u'help_soap_username',
-            default=u"it will be used to authenticate the portal actions done"\
-                u"with ISugarCRM component"),
+            default=(u"it will be used to authenticate the portal actions done"
+                     u"with ISugarCRM component")),
         required=True,
     )
 
@@ -51,7 +49,8 @@ class ISugarCRMSchema(interface.Interface):
 
     activate_pasplugin = schema.Bool(
         title=_(u'label_activate_pasplugin',
-        default=u'Activate PAS Plugin (Authentication, User properties) '),
+                default=(u'Activate PAS Plugin (Authentication,'
+                         'User properties)')),
         default=False
     )
 

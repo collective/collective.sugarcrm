@@ -1,10 +1,8 @@
 import logging
 logger = logging.getLogger('collective.sugarcrm')
-import copy
 
 from Products.PluggableAuthService import plugins
 from Products.PluggableAuthService import interfaces
-from Products.PluggableAuthService import utils
 
 from App.class_init import InitializeClass
 from OFS.Cache import Cacheable
@@ -122,11 +120,12 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
             if not webinfo:
                 continue
             qs = 'user_id=%s' % i
-            info = {'id': i,
-                    'login': i,
-                    'pluginid': plugin_id,
-                    'editurl': '%s?%s' % (e_url, qs),
-                   }
+            info = {
+                'id': i,
+                'login': i,
+                'pluginid': plugin_id,
+                'editurl': '%s?%s' % (e_url, qs),
+            }
             user_info.append(info)
 
         if len(user_info) == 0:
@@ -153,8 +152,10 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
             if result['user_name'] == user_name:
                 properties = {
                     'email': str(result.get('email_address')),
-                    'fullname': unicode(result.get('first_name')) + u' ' +\
-                         unicode(result.get('last_name'))
+                    'fullname': u'%s %s' % (
+                        unicode(result.get('first_name')) + u' ' +
+                        unicode(result.get('last_name'))
+                    )
                 }
 
         return properties
@@ -176,14 +177,15 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
 
     security.declarePrivate('enumerateUsers')
 
-    def enumerateUsers(self,
-                       id=None,
-                       login=None,
-                       exact_match=False,
-                       sort_by=None,
-                       max_results=None,
-                       **kw
-                      ):
+    def enumerateUsers(
+        self,
+        id=None,
+        login=None,
+        exact_match=False,
+        sort_by=None,
+        max_results=None,
+        **kw
+    ):
 
         if not self.activated:
             return []
@@ -208,25 +210,29 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
 
         keywords = {'id': lookup_ids[0]}
 
-        cached_info = self.ZCacheable_get(view_name=view_name,
-                                          keywords=keywords,
-                                          default="not_in_cache"
-                                         )
+        cached_info = self.ZCacheable_get(
+            view_name=view_name,
+            keywords=keywords,
+            default="not_in_cache"
+        )
 
         if cached_info != "not_in_cache":
             return tuple(cached_info)
 
-        user_info = SugarCRMPASPlugin.enumerateUsers(self, id=id,
-                      login=login,
-                      exact_match=exact_match,
-                      sort_by=sort_by,
-                      max_results=max_results,
-                      **kw
-                      )
+        user_info = SugarCRMPASPlugin.enumerateUsers(
+            self, id=id,
+            login=login,
+            exact_match=exact_match,
+            sort_by=sort_by,
+            max_results=max_results,
+            **kw
+        )
 
-        self.ZCacheable_set(user_info,
-                            view_name=view_name,
-                            keywords=keywords)
+        self.ZCacheable_set(
+            user_info,
+            view_name=view_name,
+            keywords=keywords
+        )
 
         return tuple(user_info)
 
@@ -245,8 +251,8 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
         if not login or not password:
             return None
 
-        utility = self._passord_utility()
-        encrypted_password = utility.crypt(password)
+        #utility = self._passord_utility()
+        #encrypted_password = utility.crypt(password)
         view_name = 'sugarcrmauthenticateCredentials'
         keywords = {'login': login, 'password': password}
 
@@ -293,9 +299,10 @@ class AuthPlugin(SugarCRMPASPlugin, Cacheable):
     #
     #   ZMI
     #
-    manage_options = (({'label': 'Users', 'action': 'manage_users', },)
-                     + SugarCRMPASPlugin.manage_options
-                     + Cacheable.manage_options
-                     )
+    manage_options = (
+        ({'label': 'Users', 'action': 'manage_users', },)
+        + SugarCRMPASPlugin.manage_options
+        + Cacheable.manage_options
+    )
 
 InitializeClass(AuthPlugin)
