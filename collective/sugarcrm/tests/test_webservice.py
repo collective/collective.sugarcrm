@@ -33,7 +33,7 @@ class FakeFault(object):
 
 class FakeResults(object):
     def __init__(self, entry_list=[]):
-        self.entry_list= entry_list
+        self.entry_list = entry_list
 
 
 class FakeService(object):

@@ -145,12 +145,6 @@ class WebService(object):
                                                           password, crypt))
                 return None
             raise e
-#        except AttributeError, e:
-#            msg = "'NoneType' object has no attribute 'promotePrefixes'"
-#            if e.message == msg:
-#                logger.error('invalid login: %s %s %s' % (username,
-#                                                          password, crypt))
-#                return None
 
         return login
 

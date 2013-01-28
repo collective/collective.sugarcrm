@@ -13,8 +13,10 @@ class FakeSugarCRM(object):
             return []
         results = []
         if query_string == 'will':
-            results.append({'user_name': 'will','email_address':'will@sugarcrm.com',
-                            'first_name':u'Will', 'last_name':u'DUPONT'})
+            results.append({'user_name': 'will',
+                            'email_address': 'will@sugarcrm.com',
+                            'first_name': u'Will',
+                            'last_name': u'DUPONT'})
         return results
 
     def login(self, username, password, crypt=False):
