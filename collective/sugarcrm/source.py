@@ -11,11 +11,11 @@ logger = logging.getLogger('collective.sugarcrm')
 class ContactQuerySource(object):
     """A query source based on a sugarcrm webservice
     """
-    interface.implements(IQuerySource) #IVocabularyTokenized
+    interface.implements(IQuerySource)
 
     vocabulary = SimpleVocabulary(())
     sugarcrm_module = "Contacts"
-    
+
     def __init__(self, context):
 
         self.context = context
@@ -25,7 +25,7 @@ class ContactQuerySource(object):
 
         contains = len(self.webservice.get_entry(id=value,
                                             module=self.sugarcrm_module)) > 0
-        logger.debug('source.contains %s -> %s'%(value, contains))
+        logger.debug('source.contains %s -> %s' % (value, contains))
         return contains
 
     def getTerm(self, value):
@@ -35,18 +35,19 @@ class ContactQuerySource(object):
         #I know, I'm suppose to raise LookupError, but it fails with
         #plone.formwidget.autocomplete (my only use case at the moment)
         if not entry:
-            logger.error('source.getTerm: lookuperror of %s ->SimpleTerm'%value)
+            msg = 'source.getTerm: lookuperror of %s ->SimpleTerm' % value
+            logger.error(msg)
             return SimpleTerm(value, value, value)
             #raise LookupError(value)
         elif 'deleted' in entry.keys():
-            if entry['deleted'] != "0":#default behaviour of sugarcrm
+            if entry['deleted'] != "0":  # default behaviour of sugarcrm
                 logger.error('source.getTerm: lookuperror deleted returned\
-                              for %s. %s'%(value, entry))
+                              for %s. %s' % (value, entry))
                 return SimpleTerm(value, value, value)
                 #raise LookupError(value)
 
         term = self.buildTerm(entry)
-        logger.debug('source.getTerm(%s) -> %s'%(value, term.title))
+        logger.debug('source.getTerm(%s) -> %s' % (value, term.title))
 
         return term
 
@@ -55,14 +56,14 @@ class ContactQuerySource(object):
 
         i = entry
 
-        title = i.get('name','')
+        title = i.get('name', '')
         if 'first_name' in i.keys() and 'last_name' in i.keys():
-            title = ' '.join((i.get('first_name','') or '',
-                              i.get('last_name','') or '')).strip()
+            title = ' '.join((i.get('first_name', '') or '',
+                              i.get('last_name', '') or '')).strip()
 
-        account_name = i.get('account_name','')
+        account_name = i.get('account_name', '')
         if account_name:
-            title += ' - '+account_name
+            title += ' - ' + account_name
 
         return SimpleTerm(i['id'], i['id'], title)
 
@@ -82,11 +83,12 @@ class ContactQuerySource(object):
         return 100
 
     def search(self, query_string):
-        
-        is_id = len(query_string.split('-'))==5
+
+        is_id = len(query_string.split('-')) == 5
         if is_id:
             term = self.getTerm(query_string)
-            logger.debug("source.search(%s) -> %s"%(query_string, term.title))
+            msg = "source.search(%s) -> %s" % (query_string, term.title)
+            logger.debug(msg)
             return SimpleVocabulary([term])
 
         results = self.webservice.search(query_string=query_string,
@@ -94,14 +96,17 @@ class ContactQuerySource(object):
                                          max=25)
         terms = [self.buildTerm(i) for i in results]
 
-        logger.debug("source.search(%s) -> %s"%(query_string, len(terms)))
+        debug = "source.search(%s) -> %s" % (query_string, len(terms))
+        logger.debug(debug)
         return SimpleVocabulary(terms)
+
 
 class ContactSourceBinder(object):
     interface.implements(IContextSourceBinder)
+
     def __call__(self, context):
-#        return DummyQuerySource(context)
         return ContactQuerySource(context)
+
 
 class AccountQuerySource(ContactQuerySource):
 
@@ -110,11 +115,11 @@ class AccountQuerySource(ContactQuerySource):
     def buildTerm(self, entry):
 
         i = entry
-        title = i.get('name','')
+        title = i.get('name', '')
 
         if 'first_name' in i.keys() and 'last_name' in i.keys():
-            title = ' '.join((i.get('first_name',''),
-                             i.get('last_name',''))).strip()
+            title = ' '.join((i.get('first_name', ''),
+                             i.get('last_name', ''))).strip()
 
         if 'billing_address_city' in i.keys():
             if i['billing_address_city']:
@@ -125,5 +130,6 @@ class AccountQuerySource(ContactQuerySource):
 
 class AccountSourceBinder(object):
     interface.implements(IContextSourceBinder)
+
     def __call__(self, context):
         return AccountQuerySource(context)

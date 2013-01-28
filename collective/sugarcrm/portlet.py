@@ -1,19 +1,25 @@
-from collective.portlet.contact.interfaces import IPortletContactUtility
-from collective.sugarcrm import interfaces
+from zope import component
 from zope import interface
-#from collective.portlet.contact.utils import encode_email
+
 from Products.CMFCore.utils import getToolByName
+
+from collective.portlet.contact.addressbook import IAddressBook
+from collective.sugarcrm import interfaces
 
 
 class Contact(object):
     """Utility class for collective.portlet.contact backend. It use
     'Contacts' module."""
-    interface.implements(IPortletContactUtility)
+    interface.implements(IAddressBook)
+    component.adapts(interface.Interface)
 
-    def search(self, context, q="", limit=10):
+    def __init__(self, context):
+        self.context = context
+
+    def search(self, q="", limit=10):
         """search within sugarcrm contacts"""
 
-        sugarcrm = interfaces.ISugarCRM(context)
+        sugarcrm = interfaces.ISugarCRM(self.context)
         results = sugarcrm.search(query_string=q,
                         module="Contacts", max=limit)
 
@@ -27,11 +33,11 @@ class Contact(object):
 
         return '\n'.join(items)
 
-    def getContactInfos(self, context, uniq_id):
+    def getContactInfos(self, uniq_id):
         """search within sugarcrm contacts"""
 
-        urltool = getToolByName(context, 'portal_url')
-        sugarcrm = interfaces.ISugarCRM(context)
+        urltool = getToolByName(self.context, 'portal_url')
+        sugarcrm = interfaces.ISugarCRM(self.context)
         c = sugarcrm.get_entry(module="Contacts", id=uniq_id)
 
         if not c:

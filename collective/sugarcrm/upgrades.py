@@ -1,5 +1,6 @@
 from Products.CMFCore.utils import getToolByName
 
+
 def upgrade_1_to_2(context):
     setup = getToolByName(context, "portal_setup")
     setup.runImportStepFromProfile(
@@ -10,4 +11,3 @@ def upgrade_1_to_2(context):
         'profile-collective.sugarcrm:default',
         'pasplugin.sugarcrm',
         purge_old=False)
-

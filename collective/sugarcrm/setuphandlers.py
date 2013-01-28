@@ -3,6 +3,7 @@ from collective.sugarcrm import pasplugin as plugin
 plugin_id = "sugarcrm"
 plugin_title = plugin.AuthPlugin.meta_type
 
+
 def setupPasPlugin(context):
     if context.readDataFile('sugarcrm.txt') is None:
         return
@@ -19,7 +20,7 @@ def setupPasPlugin(context):
                                         'IUserEnumerationPlugin',
                                         'IPropertiesPlugin'])
 
-    #because default plone properties plugin mask any other, 
+    #because default plone properties plugin mask any other,
     #you must place it before it
     iface = pas.plugins._getInterfaceFromName('IPropertiesPlugin')
     pluginids = pas.plugins.listPluginIds(iface)
@@ -29,6 +30,7 @@ def setupPasPlugin(context):
 
     #set _activated var to None to reactivate pas plugin
     provider._activated = None
+
 
 def uninstallPasPlugin(context):
     if context.readDataFile('sugarcrm.txt') is None:

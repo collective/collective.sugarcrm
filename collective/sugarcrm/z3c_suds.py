@@ -10,6 +10,7 @@ except ImportError:
     except ImportError:
         _get_default_context = lambda: None
 
+
 def get_suds_client(wsdl_uri, **kwargs):
 
     context = kwargs.pop('context', None)
@@ -30,12 +31,12 @@ def get_suds_client(wsdl_uri, **kwargs):
             cache = getattr(jar, 'foreign_connections', None)
             if cache is None:
                 cache = jar.foreign_connections = {}
-        
+
         cache_key = 'suds_%s' % wsdl_uri
         client = cache.get(cache_key)
         if client is None:
             client = cache[cache_key] = Client(wsdl_uri, **kwargs)
-    
+
     return client
 
 __all__ = ('get_suds_client',)

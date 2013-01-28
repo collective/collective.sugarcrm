@@ -12,35 +12,42 @@ from suds import WebFault
 
 logger = logging.getLogger('collective.sugarcrm')
 
-METHODS = ('login', 'logout', 'get_entry', 'search_by_module', 'get_module_fields')
+METHODS = (
+    'login', 'logout', 'get_entry', 'search_by_module', 'get_module_fields'
+)
+
 
 def session_cache_key(fun, self):
     #5 minutes
     username = self.username
     password = self.password
-    five_minute = str(time() // (5*60))
+    five_minute = str(time() // (5 * 60))
     return five_minute + username + password
+
 
 def get_entry_cache_key(fun, self, session=None, module='Contacts',  id='',
                   select_fields=[]):
     #one hour + module + id
-    one_hour = str(time() // (60*60))
-    cache_key = one_hour +"-"+ module +"-"+ id
+    one_hour = str(time() // (60 * 60))
+    cache_key = one_hour + "-" + module + "-" + id
     return cache_key
 
+
 def get_module_fields_cache_key(fun, self, session=None, module="Contacts"):
-    one_hour = str(time() // (60*60))
-    cache_key = one_hour +"-"+ module
+    one_hour = str(time() // (60 * 60))
+    cache_key = one_hour + "-" + module
     return cache_key
 
 
 class WebService(object):
     """Code base between normal and loggedin component"""
-    
+
     interface.implements(interfaces.IComplexArgFactory,
                          interfaces.ISugarCRM)
 
-    def __init__(self, context, url="", username="", password="", activated=False):
+    def __init__(
+        self, context, url="", username="", password="", activated=False
+    ):
         """If context is not, you must provide url"""
 
         if context is not None:
@@ -65,21 +72,22 @@ class WebService(object):
 
     @property
     def client(self):
-        if not self.activated: return
+        if not self.activated:
+            return
         if self._client is not None:
             return self._client
         client = None
         try:
-            url = self.url+'?wsdl'
-            #fix 404 exception on login: http://stackoverflow.com/questions/6499770/why-am-i-getting-exception-404-unot-found-with-suds
+            url = self.url + '?wsdl'
+            #fix 404 exception on login: http://goo.gl/V5o73
             client = get_suds_client(url, context=self.context, location=url)
-        except ValueError, e:
+        except ValueError:
             logger.error("invalid SOAP URL: client instanciation fail")
-        valid = True #try now to validate the existing client
+        valid = True  # try now to validate the existing client
         if client is not None:
             for method in METHODS:
                 if not hasattr(client.service, method):
-                    logger.error("invalid SOAP URL: no %s"%method)
+                    logger.error("invalid SOAP URL: no %s" % method)
                     valid = False
                     break
         if not valid:
@@ -87,13 +95,13 @@ class WebService(object):
         if client is not None:
             self._client = client
         else:
-            logger.error("client is none:%s %s %s"%(self.url,self.username,
+            logger.error("client is none:%s %s %s" % (self.url, self.username,
                                                     self.password))
         return client
 
     def create(self, argument_type):
         """Create arguements types.
-        
+
         How to use it:
         >>> crm = SugarCRM(None, "http://trial.sugarcrm.com/mwlcpt5183")
         >>> auth = crm.create("user_auth")
@@ -103,7 +111,8 @@ class WebService(object):
         There are 120 available types on SugarCRM 6. To get types, just print
         print the suds client on current output
         """
-        if not self.activated: return
+        if not self.activated:
+            return
         if self.client is not None:
             return self.client.factory.create(argument_type)
 
@@ -116,8 +125,10 @@ class WebService(object):
         return info
 
     def login(self, username, password, crypt=False):
-        if not self.activated: return
-        if self.client is None: return
+        if not self.activated:
+            return
+        if self.client is None:
+            return
 
         user = self.client.factory.create('user_auth')
         user.user_name = username
@@ -130,30 +141,41 @@ class WebService(object):
             login = self.client.service.login(user)
         except WebFault, e:
             if e.fault.faultstring == "Invalid Login":
-                logger.error('invalid login: %s %s %s'%(username,
-                                                        password, crypt))
+                logger.error('invalid login: %s %s %s' % (username,
+                                                          password, crypt))
                 return None
             raise e
+#        except AttributeError, e:
+#            msg = "'NoneType' object has no attribute 'promotePrefixes'"
+#            if e.message == msg:
+#                logger.error('invalid login: %s %s %s' % (username,
+#                                                          password, crypt))
+#                return None
+
         return login
 
     def password_utility(self):
         return component.getUtility(interfaces.IPasswordEncryption)
 
     def logout(self, session):
-        if not self.activated: return
-        if self.client is None: return
+        if not self.activated:
+            return
+        if self.client is None:
+            return
         self.client.service.logout(session)
 
     @property
     def session(self):
         """Return the session of loggedin portal soap account"""
 
-        if not self.activated: return
-        if self.client is None: return
+        if not self.activated:
+            return
+        if self.client is None:
+            return
 
         login = self.login(self.username, self.password, crypt=True)
         if login is not None:
-            logger.debug('ws.session -> %s'%login.id)
+            logger.debug('ws.session -> %s' % login.id)
             return str(login.id)
 
         logger.debug('ws.session -> None')
@@ -162,15 +184,17 @@ class WebService(object):
                 offset="0", max="100"):
         """search a contact or whatevery you want. The search is based on
         query_string argument and given module (default to Contacts)
-        
+
         Return a list of dict with all the content from the response
         """
 
-        if not self.activated: return[]
-        if self.client is None: return []
-        if session is None: #session as arg
+        if not self.activated:
+            return[]
+        if self.client is None:
+            return []
+        if session is None:  # session as arg
             session = self.session
-        if session is None: #session is invalid
+        if session is None:  # session is invalid
             return []
         if type(query_string) == unicode:
             query_string = query_string.encode('utf-8')
@@ -186,18 +210,19 @@ class WebService(object):
             for entry in m.records:
                 infos.append(self._entry2dict(entry, name_value_list=False))
 
-        logger.debug('ws.search %s -> %s results'%(query_string, len(infos)))
+        logger.debug('ws.search %s -> %s results' % (query_string, len(infos)))
         return infos
-
 
     def get_entry(self, session=None, module='Contacts',  id='',
                   select_fields=[]):
 
-        if not self.activated: return
-        if self.client is None: return
-        if session is None: #session as arg
+        if not self.activated:
+            return
+        if self.client is None:
+            return
+        if session is None:  # session as arg
             session = self.session
-        if session is None: #session is invalid
+        if session is None:  # session is invalid
             return {}
 
         if not select_fields:
@@ -220,11 +245,13 @@ class WebService(object):
 
     def get_module_fields(self, session=None, module="Contacts"):
 
-        if not self.activated: return []
-        if self.client is None: return []
-        if session is None: #session as arg
+        if not self.activated:
+            return []
+        if self.client is None:
+            return []
+        if session is None:  # session as arg
             session = self.session
-        if session is None: #session is invalid
+        if session is None:  # session is invalid
             return []
 
         results = self.client.service.get_module_fields(session, module)
@@ -234,6 +261,7 @@ class WebService(object):
         self._module_fields[module] = fields
 
         return fields
+
 
 class WebServiceCached(WebService):
 
@@ -254,4 +282,3 @@ class WebServiceCached(WebService):
     def get_module_fields(self, session=None, module="Contacts"):
         return super(WebServiceCached, self).get_module_fields(session=session,
                                                          module=module)
-

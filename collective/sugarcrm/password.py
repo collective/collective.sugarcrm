@@ -2,6 +2,7 @@ import md5
 from collective.sugarcrm import interfaces
 from zope import interface
 
+
 class Password(object):
     """Password default encryption for sugarcrm"""
     interface.implements(interfaces.IPasswordEncryption)
