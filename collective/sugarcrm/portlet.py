@@ -59,5 +59,3 @@ class Contact(object):
                 'employeetype': c.get('title', ''),
                 'uid': uniq_id,
                 'photourl': jpegurl}
-
-contact = Contact()

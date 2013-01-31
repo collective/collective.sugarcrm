@@ -41,11 +41,10 @@
       />
 
   <!-- PORTLET CONTACT -->
-  <utility
-     component=".portlet.contact"
-     provides="collective.portlet.contact.interfaces.IPortletContactUtility"
-     name="sugarcrm"
-     zcml:condition="installed collective.portlet.contact"/>
+  <adapter
+     zcml:condition="installed collective.portlet.contact"
+     factory=".portlet.Contact"
+     name="sugarcrm" />
 
   <!-- INSTALL AND UPGRADES -->
   <include file="profiles.zcml" />
