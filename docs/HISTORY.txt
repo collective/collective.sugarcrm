@@ -5,7 +5,9 @@ Changelog
 ----------------
 
 - add new classifiers
-
+- use plone.app.testing for tests
+- addon doesn't work with SugarCRM 6.6, tested on 6.2.4. 
+- fix compatibility with collective.portlet.contact 1.1
 
 1.1 (2012-03-26)
 ----------------
