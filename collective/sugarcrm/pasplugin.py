@@ -153,7 +153,7 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
                 properties = {
                     'email': str(result.get('email_address')),
                     'fullname': u'%s %s' % (
-                        unicode(result.get('first_name')) + u' ' +
+                        unicode(result.get('first_name')),
                         unicode(result.get('last_name'))
                     )
                 }
