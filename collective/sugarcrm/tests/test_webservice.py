@@ -77,31 +77,31 @@ class UnitTest(unittest.TestCase):
 
     def test_activated(self):
         ws = WebService(None)
-        self.failUnless(ws.activated == False)
-        self.failUnless(self.ws.activated == True)
+        self.assertFalse(ws.activated)
+        self.assertTrue(self.ws.activated)
 
     def test_client(self):
-        self.failUnless(type(self.ws.client) == FakeClient)
+        self.assertEqual(type(self.ws.client), FakeClient)
 
     def test_create(self):
         created = self.ws.create('user_auth')
-        self.failUnless(type(created) == FakeUserAuth, created)
+        self.assertEqual(type(created), FakeUserAuth, created)
 
     def test_login(self):
         login = self.ws.login('will', 'will')
-        self.failUnless(login.id == 'session')
-        self.failUnless(self.ws.login('', '') is None)
+        self.assertTrue(login.id == 'session')
+        self.assertTrue(self.ws.login('', '') is None)
 
     def test_logout(self):
         self.ws.logout('session')
-        self.failUnless(self.ws._client.service.logged == False)
+        self.assertFalse(self.ws._client.service.logged)
 
     def test_session(self):
         session = self.ws.session
-        self.failUnless(session == 'session')
+        self.assertTrue(session == 'session')
         self.ws.username = ''
         session = self.ws.session
-        self.failUnless(session is None)
+        self.assertTrue(session is None)
 
     def test_search(self):
         pass
@@ -121,11 +121,13 @@ class IntegrationTest(unittest.TestCase):
         self.url = utils.SOAP['soap_url']
         self.username = utils.SOAP['soap_username']
         self.password = utils.SOAP['soap_password']
-        self.ws = WebService(None,
-                             url=self.url,
-                        username=self.username,
-                        password=self.password,
-                        activated=True)
+        self.ws = WebService(
+            None,
+            url=self.url,
+            username=self.username,
+            password=self.password,
+            activated=True
+        )
         gsm = getGlobalSiteManager()
         passwordUtility = Password()
         gsm.registerUtility(passwordUtility, interfaces.IPasswordEncryption)
@@ -136,12 +138,12 @@ class IntegrationTest(unittest.TestCase):
         self.assertEqual(ws.url, self.url)
         self.assertEqual(ws.username, self.username)
         self.assertEqual(ws.password, self.password)
-        self.assert_(ws.client is not None)
-        self.assert_(ws.activated == True)
+        self.assertTrue(ws.client is not None)
+        self.assertTrue(ws.activated)
         #check interface implementation
-        self.assert_(interfaces.ISugarCRM.providedBy(ws))
+        self.assertTrue(interfaces.ISugarCRM.providedBy(ws))
         try:
-            self.failUnless(verify.verifyObject(interfaces.ISugarCRM, ws))
+            self.assertTrue(verify.verifyObject(interfaces.ISugarCRM, ws))
         except verify.BrokenImplementation, e:
             self.fail(str(e))
 
@@ -165,7 +167,7 @@ class IntegrationTest(unittest.TestCase):
     def test_logout(self):
         login = self.ws.login(self.username, self.password, crypt=True)
         self.ws.logout(login.id)
-        self.failUnlessRaises(suds.WebFault,
+        self.assertRaises(suds.WebFault,
                           self.ws.search,
                           login.id, utils.CONTACT['first_name'])
 
@@ -177,14 +179,15 @@ class IntegrationTest(unittest.TestCase):
 
     def test_search(self):
         results = self.ws.search(query_string=utils.CONTACT['first_name'])
-        jerald = results[0]
-        self.assertEqual(jerald['name'], utils.CONTACT['name'])
+        contact = results[0]
+        self.assertEqual(contact['name'], utils.CONTACT['name'])
         for k in ('name', 'phone_work', 'title', 'assigned_user_name',
                   'account_name', 'id'):
-            self.assert_(k in jerald.keys(), '%s not in results' % k)
+            self.assert_(k in contact.keys(), '%s not in results' % k)
 
     def test_get_entry(self):
-        results = self.ws.search(query_string='jerald')
+        results = self.ws.search(query_string='hubert')
+        self.assertTrue(len(results) > 0)
         id = results[0]['id']
         entry = self.ws.get_entry(id=id)
         self.assertEqual(entry['first_name'], utils.CONTACT['first_name'])

@@ -6,6 +6,7 @@ Changelog
 
 - fix TypeError: not enough arguments for format string in pasplugin
 - add travis support
+- Fix tests + pep8
 
 
 1.2 (2013-01-31)

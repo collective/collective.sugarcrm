@@ -6,7 +6,7 @@ from collective.sugarcrm.tests import base, utils
 
 class FakeSugarCRM(object):
     def search(self, session=None, query_string='', module='Contacts',
-                offset="0", max="100"):
+               offset="0", max="100"):
         if module != 'Users':
             return []
         if not query_string:

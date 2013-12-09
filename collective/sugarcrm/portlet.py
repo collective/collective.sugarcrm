@@ -20,8 +20,7 @@ class Contact(object):
         """search within sugarcrm contacts"""
 
         sugarcrm = interfaces.ISugarCRM(self.context)
-        results = sugarcrm.search(query_string=q,
-                        module="Contacts", max=limit)
+        results = sugarcrm.search(query_string=q, module="Contacts", max=limit)
 
         items = []
         for item in results:
@@ -41,12 +40,14 @@ class Contact(object):
         c = sugarcrm.get_entry(module="Contacts", id=uniq_id)
 
         if not c:
-            return {'fullname': '',
+            return {
+                'fullname': '',
                 'phonenumber': '',
                 'mail': '',
                 'employeetype': '',
                 'uid': uniq_id,
-                'photourl': ''}
+                'photourl': ''
+            }
 
         jpegurl = urltool() + '/@@ldapJpegPhoto?uid=' + uniq_id
 

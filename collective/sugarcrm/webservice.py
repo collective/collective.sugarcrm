@@ -1,14 +1,16 @@
-from suds.client import Client
-from collective.sugarcrm import interfaces
+import logging
+from time import time
+
+from suds import WebFault
+
 from zope import component
 from zope import interface
-from Products.CMFCore.utils import getToolByName
-import logging
 from z3c_suds import get_suds_client
-from suds.client import Client
+
+from Products.CMFCore.utils import getToolByName
 from plone.memoize import ram
-from time import time
-from suds import WebFault
+
+from collective.sugarcrm import interfaces
 
 logger = logging.getLogger('collective.sugarcrm')
 
@@ -25,8 +27,8 @@ def session_cache_key(fun, self):
     return five_minute + username + password
 
 
-def get_entry_cache_key(fun, self, session=None, module='Contacts',  id='',
-                  select_fields=[]):
+def get_entry_cache_key(fun, self, session=None, module='Contacts', id='',
+                        select_fields=[]):
     #one hour + module + id
     one_hour = str(time() // (60 * 60))
     cache_key = one_hour + "-" + module + "-" + id
@@ -67,7 +69,6 @@ class WebService(object):
         self._valid_credentials = None
         self._client = None
 
-        #self.client = Client(self.url+'?wsdl')
         self._module_fields = {}
 
     @property
@@ -83,6 +84,7 @@ class WebService(object):
             client = get_suds_client(url, context=self.context, location=url)
         except ValueError:
             logger.error("invalid SOAP URL: client instanciation fail")
+
         valid = True  # try now to validate the existing client
         if client is not None:
             for method in METHODS:
@@ -92,18 +94,17 @@ class WebService(object):
                     break
         if not valid:
             client = None
-        if client is not None:
-            self._client = client
+            msg = "client is none:%s %s %s"
+            logger.error(msg % (self.url, self.username, self.password))
         else:
-            logger.error("client is none:%s %s %s" % (self.url, self.username,
-                                                    self.password))
+            self._client = client
         return client
 
     def create(self, argument_type):
         """Create arguements types.
 
         How to use it:
-        >>> crm = SugarCRM(None, "http://trial.sugarcrm.com/mwlcpt5183")
+        >>> crm = WebService(None, "http://trial.sugarcrm.com/mwlcpt5183")
         >>> auth = crm.create("user_auth")
         >>> auth.user_name = "admin"
         >>> auth.password = "blabla"
@@ -175,7 +176,7 @@ class WebService(object):
         logger.debug('ws.session -> None')
 
     def search(self, session=None, query_string='', module='Contacts',
-                offset="0", max="100"):
+               offset="0", max="100"):
         """search a contact or whatevery you want. The search is based on
         query_string argument and given module (default to Contacts)
 
@@ -207,7 +208,7 @@ class WebService(object):
         logger.debug('ws.search %s -> %s results' % (query_string, len(infos)))
         return infos
 
-    def get_entry(self, session=None, module='Contacts',  id='',
+    def get_entry(self, session=None, module='Contacts', id='',
                   select_fields=[]):
 
         if not self.activated:
@@ -225,7 +226,7 @@ class WebService(object):
                 fields = self._module_fields[module]
             else:
                 fields = self.get_module_fields(session=str(session),
-                                                 module=str(module))
+                                                module=str(module))
             select_fields = [field for field in fields]
 
         results = self.client.service.get_entry(session, module, id,
@@ -265,14 +266,17 @@ class WebServiceCached(WebService):
         return super(WebServiceCached, self).session
 
     @ram.cache(get_entry_cache_key)
-    def get_entry(self, session=None, module='Contacts',  id='',
+    def get_entry(self, session=None, module='Contacts', id='',
                   select_fields=[]):
-        return super(WebServiceCached, self).get_entry(session=session,
-                                                 module=module,
-                                                 id=id,
-                                                 select_fields=select_fields)
+        return super(WebServiceCached, self).get_entry(
+            session=session,
+            module=module,
+            id=id,
+            select_fields=select_fields
+        )
 
     @ram.cache(get_module_fields_cache_key)
     def get_module_fields(self, session=None, module="Contacts"):
-        return super(WebServiceCached, self).get_module_fields(session=session,
-                                                         module=module)
+        return super(WebServiceCached, self).get_module_fields(
+            session=session, module=module
+        )

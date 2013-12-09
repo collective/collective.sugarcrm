@@ -7,10 +7,10 @@ SOAP = {
 }
 print SOAP
 
-CONTACT = {'first_name': 'Jerald',
-           'last_name': 'Arenas',
-           'name': 'Jerald Arenas',
-           'city': 'Cupertino'}
+CONTACT = {'first_name': 'Betty',
+           'last_name': 'Hubert',
+           'name': 'Betty Hubert',
+           'city': 'Ohio'}
 
 from ZPublisher.tests.testPublish import Request, Response
 

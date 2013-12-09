@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from plone.app.testing import *
+from plone.app.testing import (
+    PloneSandboxLayer,
+    PLONE_FIXTURE,
+    IntegrationTesting,
+    FunctionalTesting
+)
 
 
 class Fixture(PloneSandboxLayer):

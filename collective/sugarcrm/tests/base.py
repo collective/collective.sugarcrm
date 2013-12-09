@@ -4,6 +4,7 @@ import unittest2 as unittest
 
 from collective.sugarcrm import testing
 from collective.sugarcrm.tests import utils
+from plone.app.testing import setRoles, TEST_USER_ID
 
 
 class UnitTestCase(unittest.TestCase):
@@ -30,7 +31,7 @@ class IntegrationTestCase(unittest.TestCase):
         self.folder = self.portal['test-folder']
 
     def setRoles(self, roles):
-        testing.setRoles(self.portal, testing.TEST_USER_ID, roles)
+        setRoles(self.portal, TEST_USER_ID, roles)
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -40,9 +41,9 @@ class FunctionalTestCase(unittest.TestCase):
     def setUp(self):
         self.portal = self.layer['portal']
         self.request = self.layer['request']
-        testing.setRoles(self.portal, testing.TEST_USER_ID, ['Manager'])
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
         self.portal.invokeFactory('Folder', 'test-folder')
-        testing.setRoles(self.portal, testing.TEST_USER_ID, ['Member'])
+        setRoles(self.portal, TEST_USER_ID, ['Member'])
         self.folder = self.portal['test-folder']
 
 

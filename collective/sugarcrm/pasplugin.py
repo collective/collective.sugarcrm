@@ -81,37 +81,18 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
 
         return login, login
 
-    security.declarePrivate('enumerateUsers')
-
-    def enumerateUsers(self, id=None, login=None, exact_match=False,
-                       sort_by=None, max_results=None, **kw):
-        """ See IUserEnumerationPlugin.
-        """
-
-        if not self.activated:
-            return []
+    def _searchById(self, lookup_ids):
         service = self._sugarcrm()
-        if isinstance(id, basestring):
-            id = [str(id)]
-
-        if isinstance(login, basestring):
-            login = [str(login)]
-
-        lookup_ids = []
-        if login is not None and id is None:
-            lookup_ids = login
-        elif id is not None and login is None:
-            lookup_ids = id
-
         res = {}
         for i in lookup_ids:
-            if i in res.keys():
-                continue
-            if self.isInBlacklist(i):
+            if i in res.keys() or self.isInBlacklist(i):
                 continue
             logger.info('enumerateUsers not cached %s' % i)
             res[i] = service.search(query_string=i, module='Users')
 
+        return res
+
+    def _buildUserInfo(self, res):
         user_info = []
         plugin_id = self.getId()
         e_url = '%s/manage_users' % plugin_id
@@ -127,6 +108,32 @@ class SugarCRMPASPlugin(plugins.BasePlugin.BasePlugin):
                 'editurl': '%s?%s' % (e_url, qs),
             }
             user_info.append(info)
+        return user_info
+
+    security.declarePrivate('enumerateUsers')
+
+    def enumerateUsers(self, id=None, login=None, exact_match=False,
+                       sort_by=None, max_results=None, **kw):
+        """ See IUserEnumerationPlugin.
+        """
+
+        if not self.activated:
+            return []
+        if isinstance(id, basestring):
+            id = [str(id)]
+
+        if isinstance(login, basestring):
+            login = [str(login)]
+
+        lookup_ids = []
+        if login is not None and id is None:
+            lookup_ids = login
+        elif id is not None and login is None:
+            lookup_ids = id
+
+        res = self._searchById(lookup_ids)
+
+        user_info = self._buildUserInfo(res)
 
         if len(user_info) == 0:
             for i in lookup_ids:
