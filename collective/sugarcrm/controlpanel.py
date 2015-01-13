@@ -44,14 +44,16 @@ class ISugarCRMSchema(interface.Interface):
 
     activate_service = schema.Bool(
         title=_(u'label_activate_service', default=u'Activate WebService'),
-        default=False
+        default=False,
+        required=False
     )
 
     activate_pasplugin = schema.Bool(
         title=_(u'label_activate_pasplugin',
                 default=(u'Activate PAS Plugin (Authentication,'
                          'User properties)')),
-        default=False
+        default=False,
+        required=False
     )
 
 
@@ -112,7 +114,7 @@ class SugarCRMControlPanelAdapter(SchemaAdapterBase):
         return getattr(self.context.sugarcrm, name)
 
     def set(self, name, value):
-        if value and value != self.get(name):
+        if value is not None and value != self.get(name):
             setattr(self.context.sugarcrm, name, value)
 
 

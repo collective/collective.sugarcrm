@@ -84,7 +84,8 @@ class WebService(object):
             client = get_suds_client(url, context=self.context, location=url)
         except ValueError:
             logger.error("invalid SOAP URL: client instanciation fail")
-
+        except URLError:
+            logger.error("Error !")
         valid = True  # try now to validate the existing client
         if client is not None:
             for method in METHODS:
@@ -237,6 +238,59 @@ class WebService(object):
 
         #logger.debug(u'ws.get_entry(%s, %s) -> %s'%(module, id, info))
         return info
+
+    def set_entry(self, session=None, module='Contacts', name_value_list={}):
+        """
+            name_value_list : { name : value } ==>
+              if you include key 'id' it will be for updating, otherwise it's for creating
+        """
+
+        if not self.activated:
+            return
+        if self.client is None:
+            return
+        if type(name_value_list) != dict or len(name_value_list.keys()) == 0:
+            return
+
+        if session is None:  # session as arg
+            session = self.session
+        if session is None:  # session is invalid
+            return {}
+
+        results = self.client.service.set_entry(session, module, name_value_list)
+        return results
+
+    def get_entry_list(self, session=None, module='Contacts', query="", order_by="id"):
+        """
+            query : SQL
+        """
+
+        if not self.activated:
+            return
+        if self.client is None:
+            return
+
+        if session is None:  # session as arg
+            session = self.session
+        if session is None:  # session is invalid
+            return {}
+        
+        offset = 0
+        counter = 0
+        max_loop = 100
+        is_continue = True
+        results = []
+
+        while(is_continue and counter <= max_loop):
+            counter += 1
+            partial_results = self.client.service.get_entry_list(session, module, query=query, offset=offset, order_by=order_by)
+            results += [self._entry2dict(entry) for entry in partial_results.entry_list]
+            if partial_results.result_count == 0:
+                is_continue = False
+            else:
+                offset = partial_results.next_offset
+
+        return results
 
     def get_module_fields(self, session=None, module="Contacts"):
 
