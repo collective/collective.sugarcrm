@@ -9,19 +9,6 @@ This add-on provide components to use SugarCRM in Plone.
 How to install
 ==============
 
-.. image:: https://pypip.in/v/collective.sugarcrm/badge.png
-    :target: https://crate.io/packages/collective.sugarcrm/
-
-.. image:: https://pypip.in/d/collective.sugarcrm/badge.png
-    :target: https://crate.io/packages/collective.sugarcrm/
-
-.. image:: https://secure.travis-ci.org/collective/collective.sugarcrm.png
-    :target: http://travis-ci.org/#!/collective/collective.sugarcrm
-
-.. image:: https://coveralls.io/repos/collective/collective.sugarcrm/badge.png?branch=master
-    :target: https://coveralls.io/r/collective/collective.sugarcrm
-
-
 This addon can be installed has any other addons. please follow official
 documentation_
 
